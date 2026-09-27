@@ -93,6 +93,7 @@ export function linkSdkInto(packageDir) {
     if (error?.code !== "ENOENT") throw error;
   }
 
-  symlinkSync(relativeSdkDir, linkTarget, "dir");
+  const symlinkType = process.platform === "win32" ? "junction" : "dir";
+  symlinkSync(relativeSdkDir, linkTarget, symlinkType);
   return true;
 }

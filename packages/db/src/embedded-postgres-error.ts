@@ -24,6 +24,16 @@ function summarizeRecentLogs(recentLogs: string[]): string | null {
 
 function detectEmbeddedPostgresHint(recentLogs: string[]): string | null {
   const haystack = recentLogs.join("\n").toLowerCase();
+  if (
+    haystack.includes("administrative permissions") ||
+    haystack.includes("user with administrative permissions") ||
+    haystack.includes("cannot be run as root")
+  ) {
+    return (
+      "Embedded PostgreSQL cannot be started with Administrator or root permissions. " +
+      "Run Paperclip from a standard (non-elevated) terminal session, or specify an external database via DATABASE_URL."
+    );
+  }
   if (!haystack.includes("could not create shared memory segment")) {
     return null;
   }

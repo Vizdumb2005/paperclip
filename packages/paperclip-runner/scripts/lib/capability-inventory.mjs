@@ -82,7 +82,7 @@ export function encodeInventory(value) {
 }
 
 export function decodeInventory(source) {
-  const json = source.startsWith(sourceHeader) ? source.slice(sourceHeader.length) : source;
+  const json = source.replace(/^(?:#.*(?:\r?\n))+/, "");
   return JSON.parse(json);
 }
 

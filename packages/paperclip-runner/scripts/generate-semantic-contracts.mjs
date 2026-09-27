@@ -17,7 +17,7 @@ const fixtureCurrent = fixture.runner.catalogSha256 === PAPERCLIP_RUNNER_BUILD_M
 
 if (process.argv.includes("--check")) {
   const current = await readFile(outputPath, "utf8").catch(() => "");
-  if (current !== generated) {
+  if (current.replace(/\r\n/g, "\n") !== generated.replace(/\r\n/g, "\n")) {
     process.stderr.write("semantic-tool-contracts.json is stale; run generate:semantic-contracts\n");
     process.exitCode = 1;
   }
@@ -26,7 +26,8 @@ if (process.argv.includes("--check")) {
     process.exitCode = 1;
   }
   const manifest = `${JSON.stringify(await buildProtocolManifest(), null, 2)}\n`;
-  if (await readFile(manifestPath, "utf8").catch(() => "") !== manifest) {
+  const currentManifest = await readFile(manifestPath, "utf8").catch(() => "");
+  if (currentManifest.replace(/\r\n/g, "\n") !== manifest.replace(/\r\n/g, "\n")) {
     process.stderr.write("protocol/manifest.json is stale; run generate:semantic-contracts\n");
     process.exitCode = 1;
   }

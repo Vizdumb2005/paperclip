@@ -1,7 +1,9 @@
 use std::cell::Cell;
 use std::collections::VecDeque;
-use std::fs::{self, File, OpenOptions};
-use std::io::{self, BufRead, BufReader, Read, Seek, SeekFrom, Write};
+use std::fs::File;
+use std::io::{self, BufRead, BufReader, Read, Write};
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+use std::io::{Seek, SeekFrom};
 use std::path::{Path, PathBuf};
 use std::process::{Child, ChildStdin, Command, ExitStatus, Stdio};
 use std::sync::mpsc::{self, Receiver, RecvTimeoutError, SyncSender};
@@ -16,6 +18,9 @@ use std::os::unix::process::CommandExt;
 use std::os::fd::AsRawFd;
 
 #[cfg(target_os = "macos")]
+use std::fs::{self, OpenOptions};
+
+#[cfg(target_os = "macos")]
 use std::os::unix::fs::{FileExt, MetadataExt, OpenOptionsExt, PermissionsExt};
 
 #[cfg(target_os = "macos")]
@@ -28,6 +33,7 @@ use crate::local_runner::LocalRunnerError;
 
 const PROCESS_OUTPUT_QUEUE_CAPACITY: usize = 256;
 const VERIFIED_RUNTIME_EXECUTABLE_ENV: &str = "PAPERCLIP_VERIFIED_RUNTIME_EXECUTABLE";
+#[allow(dead_code)]
 const VERIFIED_COMMONJS_ARTIFACT_LOADER: &str = r#"const fs=require("node:fs");const Module=require("node:module");const filename=process.argv[1];const source=fs.readFileSync(filename,"utf8").replace(/^#![^\r\n]*(?:\r?\n|$)/,"");const artifact=new Module(filename);artifact.filename=filename;artifact.paths=[];artifact._compile(source,filename);"#;
 
 pub(crate) fn is_node_interpreter(path: &Path) -> bool {
@@ -38,32 +44,38 @@ pub(crate) fn is_node_interpreter(path: &Path) -> bool {
 
 #[derive(Clone, Debug)]
 pub struct VerifiedProcessArtifact {
+    #[allow(dead_code)]
     display_path: PathBuf,
+    #[allow(dead_code)]
     file: Arc<File>,
 }
 
 impl VerifiedProcessArtifact {
     pub fn snapshot_verified(
-        display_path: PathBuf,
-        mut file: File,
-        expected_sha256: &str,
+        _display_path: PathBuf,
+        mut _file: File,
+        _expected_sha256: &str,
     ) -> Result<Self, LocalRunnerError> {
-        file.seek(SeekFrom::Start(0)).map_err(|error| {
-            LocalRunnerError::invalid(format!(
-                "failed to rewind verified process artifact {}: {error}",
-                display_path.display()
-            ))
-        })?;
+        #[cfg(any(target_os = "linux", target_os = "macos"))]
+        {
+            _file.seek(SeekFrom::Start(0)).map_err(|error| {
+                LocalRunnerError::invalid(format!(
+                    "failed to rewind verified process artifact {}: {error}",
+                    _display_path.display()
+                ))
+            })?;
+        }
         #[cfg(target_os = "linux")]
-        let file = sealed_snapshot(&display_path, &mut file, expected_sha256)?;
+        let file = sealed_snapshot(&_display_path, &mut _file, _expected_sha256)?;
         #[cfg(target_os = "macos")]
-        let file = unlinked_snapshot(&display_path, &mut file, expected_sha256)?;
+        let file = unlinked_snapshot(&_display_path, &mut _file, _expected_sha256)?;
         #[cfg(not(any(target_os = "linux", target_os = "macos")))]
         return Err(LocalRunnerError::invalid(
             "verified process snapshots are supported only on Linux and macOS",
         ));
+        #[cfg(any(target_os = "linux", target_os = "macos"))]
         Ok(Self {
-            display_path,
+            display_path: _display_path,
             file: Arc::new(file),
         })
     }
@@ -153,6 +165,7 @@ fn unlinked_snapshot(
     result
 }
 
+#[allow(dead_code)]
 fn copy_verified(
     source: &mut File,
     destination: &mut File,
@@ -183,6 +196,7 @@ fn copy_verified(
     Ok(())
 }
 
+#[allow(dead_code)]
 fn snapshot_error(display_path: &Path, error: impl std::fmt::Display) -> LocalRunnerError {
     LocalRunnerError::invalid(format!(
         "failed to create immutable process snapshot for {}: {error}",
@@ -200,7 +214,9 @@ pub enum VerifiedProcessArgument {
 
 #[derive(Clone, Debug)]
 pub struct VerifiedProcessLaunch {
+    #[allow(dead_code)]
     program: VerifiedProcessArtifact,
+    #[allow(dead_code)]
     args: Vec<VerifiedProcessArgument>,
     inherit_runtime_executable: bool,
 }
@@ -645,6 +661,7 @@ pub struct SupervisedProcess {
 
 impl SupervisedProcess {
     #[cfg(test)]
+    #[allow(dead_code)]
     pub(crate) fn replace_output_receiver_for_test(
         &mut self,
         output: Receiver<ProcessOutput>,

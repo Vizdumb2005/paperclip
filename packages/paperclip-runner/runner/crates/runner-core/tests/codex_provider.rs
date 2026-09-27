@@ -5788,7 +5788,7 @@ fn assert_idle_failure_reconciled(resource_capacity: bool) {
     let opened = executor
         .execute(&command("open", 2, "session.open", json!({})))
         .unwrap();
-    let provider_pid = opened.result["processId"].as_u64().unwrap();
+    let _provider_pid = opened.result["processId"].as_u64().unwrap();
     let before: Value = serde_json::from_slice(&fs::read(&state_path).unwrap()).unwrap();
     assert!(
         before["activeProviderTurnId"].is_null(),

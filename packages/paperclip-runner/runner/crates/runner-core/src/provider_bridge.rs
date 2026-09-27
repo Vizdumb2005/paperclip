@@ -1040,6 +1040,7 @@ fn validate_pending_tool_call(
     bounded_json(&call.input, MAX_TOOL_VALUE_BYTES, "provider tool input")
 }
 
+#[allow(dead_code)]
 fn validate_tool_result_contract(
     authorized: &BTreeMap<String, AuthorizedTool>,
     result: &ToolResult,

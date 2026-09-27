@@ -1245,7 +1245,9 @@ pub struct ClaudeManagedProvider {
     latest_usage_snapshot: Option<Value>,
     current_budget_cents: u64,
     reconnect_backoff: Duration,
+    #[allow(dead_code)]
     config: ClaudeManagedProviderConfig,
+    #[allow(dead_code)]
     system_instructions: String,
     managed_skills: Vec<ClaudeManagedSkillRef>,
 }

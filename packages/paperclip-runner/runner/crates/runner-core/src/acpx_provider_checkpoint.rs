@@ -287,6 +287,7 @@ fn read_checkpoint_bytes(
 }
 
 fn secure_directory(path: &Path, label: &str) -> Result<(), LocalRunnerError> {
+    #[allow(unused_mut)]
     let mut builder = DirBuilder::new();
     #[cfg(unix)]
     builder.mode(0o700);

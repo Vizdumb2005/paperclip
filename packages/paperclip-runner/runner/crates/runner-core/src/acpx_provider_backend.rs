@@ -1,5 +1,5 @@
 use std::collections::{HashMap, HashSet, VecDeque};
-use std::fs::{self, DirBuilder, File};
+use std::fs::{self, DirBuilder};
 use std::io::{Read, Write};
 use std::net::TcpListener;
 use std::path::{Path, PathBuf};
@@ -1753,6 +1753,7 @@ fn replacement_continuity_payload(
 }
 
 fn secure_directory(path: &Path, label: &str) -> Result<(), DurableRunnerError> {
+    #[allow(unused_mut)]
     let mut builder = DirBuilder::new();
     #[cfg(unix)]
     builder.mode(0o700);
@@ -1790,12 +1791,12 @@ mod tests {
         directory
     }
 
-    fn write_artifact(path: &Path, contents: &[u8], executable: bool) {
+    fn write_artifact(path: &Path, contents: &[u8], _executable: bool) {
         fs::write(path, contents).unwrap();
         #[cfg(unix)]
         fs::set_permissions(
             path,
-            fs::Permissions::from_mode(if executable { 0o700 } else { 0o600 }),
+            fs::Permissions::from_mode(if _executable { 0o700 } else { 0o600 }),
         )
         .unwrap();
     }

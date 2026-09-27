@@ -45,7 +45,8 @@ for (const fixtureName of fixtureNames) {
     const path = resolve(goldenDirectory, `${fixtureName}.${kind}.json`);
     const generated = `${JSON.stringify(value, null, 2)}\n`;
     if (check) {
-      if ((await readFile(path, "utf8").catch(() => "")) !== generated) {
+      const current = await readFile(path, "utf8").catch(() => "");
+      if (current.replace(/\r\n/g, "\n") !== generated.replace(/\r\n/g, "\n")) {
         stale.push(`${fixtureName}.${kind}.json`);
       }
     } else {

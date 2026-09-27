@@ -24,8 +24,9 @@ function stopAll(code) {
   setTimeout(() => process.exit(code), 500).unref();
 }
 
+const pnpmCmd = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
 for (const job of jobs) {
-  const child = spawn("pnpm", ["run", job.script], {
+  const child = spawn(pnpmCmd, ["run", job.script], {
     stdio: ["ignore", "pipe", "pipe"],
     env: process.env,
   });

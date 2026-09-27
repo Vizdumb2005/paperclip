@@ -124,7 +124,8 @@ if (args.has("--runtime-assets-only")) {
 }
 
 function listWorkspacePackages() {
-  const result = spawnSync("pnpm", ["ls", "-r", "--depth", "-1", "--json"], {
+  const pnpmCmd = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
+  const result = spawnSync(pnpmCmd, ["ls", "-r", "--depth", "-1", "--json"], {
     cwd: repoRoot,
     encoding: "utf8",
   });

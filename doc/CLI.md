@@ -582,6 +582,23 @@ npx paperclipai agent local-cli codexcoder --company-id <company-id>
 npx paperclipai agent local-cli claudecoder --company-id <company-id>
 ```
 
+## Managed Agent Commands
+
+Provision and qualify remote managed-agent providers (locked-down Anthropic
+Agents + Environments stored as a company profile).
+
+```sh
+npx paperclipai managed-agent setup --company-id <company-id> --profile-key prod --display-name "Prod agent" --api-key-secret-id <secret-id>
+npx paperclipai managed-agent setup --company-id <company-id> --profile-key prod --display-name "Prod agent" --api-key-secret-id <secret-id> --probe
+```
+
+`--probe` is a read-only qualification: it creates and persists nothing.
+Setup acknowledges beta retention and non-ZDR/non-HIPAA status via
+`--acknowledge-retention`. Optional pins: `--model` (default
+`claude-sonnet-5`), `--agent-id` / `--agent-version` / `--environment-id` to
+adopt existing resources, `--max-session-list-cost-usd` for the session
+ceiling.
+
 ## Token Commands
 
 Agent API keys are scoped to one company and one agent. Plaintext tokens are printed once at creation.

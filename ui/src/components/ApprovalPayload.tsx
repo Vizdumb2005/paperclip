@@ -1,4 +1,4 @@
-import { UserPlus, Lightbulb, ShieldAlert, ShieldCheck } from "lucide-react";
+import { UserPlus, Lightbulb, ShieldAlert, ShieldCheck, Network, Sparkles } from "lucide-react";
 import { MarkdownBody } from "./MarkdownBody";
 import { formatCents } from "../lib/utils";
 
@@ -7,6 +7,8 @@ export const typeLabel: Record<string, string> = {
   approve_ceo_strategy: "CEO Strategy",
   budget_override_required: "Budget Override",
   request_board_approval: "Board Approval",
+  organizational_proposal: "Organizational Proposal",
+  deliverable_approval: "Client Deliverable Approval",
 };
 
 function firstNonEmptyString(...values: unknown[]): string | null {
@@ -42,6 +44,8 @@ export const typeIcon: Record<string, typeof UserPlus> = {
   approve_ceo_strategy: Lightbulb,
   budget_override_required: ShieldAlert,
   request_board_approval: ShieldCheck,
+  organizational_proposal: Network,
+  deliverable_approval: Sparkles,
 };
 
 export const defaultTypeIcon = ShieldCheck;
@@ -149,6 +153,91 @@ export function BudgetOverridePayload({ payload }: { payload: Record<string, unk
   );
 }
 
+export function OrganizationalProposalPayload({ payload }: { payload: Record<string, unknown> }) {
+  const proposalType = firstNonEmptyString(payload.proposalType);
+  const title = firstNonEmptyString(payload.title);
+  const rationale = firstNonEmptyString(payload.rationale);
+  const estimatedImpact = firstNonEmptyString(payload.estimatedImpact);
+  const changes = payload.proposedChanges && typeof payload.proposedChanges === "object" ? payload.proposedChanges : null;
+
+  return (
+    <div className="mt-4 space-y-3 text-sm">
+      {proposalType && (
+        <div className="flex items-center gap-2">
+          <span className="text-muted-foreground w-20 sm:w-24 shrink-0 text-xs">Type</span>
+          <span className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded capitalize">
+            {proposalType.replace(/_/g, " ")}
+          </span>
+        </div>
+      )}
+      {title && (
+        <div className="space-y-1">
+          <p className="text-(length:--text-micro) font-medium uppercase tracking-(--tracking-label) text-muted-foreground">Title</p>
+          <p className="font-medium text-foreground">{title}</p>
+        </div>
+      )}
+      {rationale && (
+        <div className="space-y-1">
+          <p className="text-(length:--text-micro) font-medium uppercase tracking-(--tracking-label) text-muted-foreground">Rationale</p>
+          <MarkdownBody className="leading-6 text-foreground/90">{rationale}</MarkdownBody>
+        </div>
+      )}
+      {estimatedImpact && (
+        <div className="rounded-lg border border-border/60 bg-muted/30 px-3.5 py-2.5">
+          <p className="text-(length:--text-micro) font-medium uppercase tracking-(--tracking-label) text-muted-foreground">Estimated Impact</p>
+          <p className="mt-1 text-xs text-foreground/90">{estimatedImpact}</p>
+        </div>
+      )}
+      {changes && (
+        <div className="space-y-1">
+          <p className="text-(length:--text-micro) font-medium uppercase tracking-(--tracking-label) text-muted-foreground">Proposed Adjustments</p>
+          <pre className="max-h-48 overflow-auto rounded-lg border border-border/60 bg-muted/50 px-3 py-2 font-mono text-xs text-muted-foreground whitespace-pre-wrap">
+            {JSON.stringify(changes, null, 2)}
+          </pre>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function DeliverableApprovalPayload({ payload }: { payload: Record<string, unknown> }) {
+  const title = firstNonEmptyString(payload.title);
+  const summary = firstNonEmptyString(payload.summary);
+  const client = firstNonEmptyString(payload.clientName);
+  const deliverableUrl = firstNonEmptyString(payload.deliverableUrl);
+
+  return (
+    <div className="mt-4 space-y-3 text-sm">
+      {client && <PayloadField label="Client" value={client} />}
+      {title && (
+        <div className="space-y-1">
+          <p className="text-(length:--text-micro) font-medium uppercase tracking-(--tracking-label) text-muted-foreground">Deliverable</p>
+          <p className="font-medium text-foreground">{title}</p>
+        </div>
+      )}
+      {summary && (
+        <div className="space-y-1">
+          <p className="text-(length:--text-micro) font-medium uppercase tracking-(--tracking-label) text-muted-foreground">Summary</p>
+          <MarkdownBody className="leading-6 text-foreground/90">{summary}</MarkdownBody>
+        </div>
+      )}
+      {deliverableUrl && (
+        <div className="space-y-1">
+          <p className="text-(length:--text-micro) font-medium uppercase tracking-(--tracking-label) text-muted-foreground">Link</p>
+          <a
+            href={deliverableUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-primary underline underline-offset-4 hover:opacity-80"
+          >
+            {deliverableUrl}
+          </a>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function BoardApprovalPayload({
   payload,
   hideTitle = false,
@@ -249,6 +338,8 @@ export function ApprovalPayloadRenderer({
 }) {
   if (type === "hire_agent") return <HireAgentPayload payload={payload} />;
   if (type === "budget_override_required") return <BudgetOverridePayload payload={payload} />;
+  if (type === "organizational_proposal") return <OrganizationalProposalPayload payload={payload} />;
+  if (type === "deliverable_approval") return <DeliverableApprovalPayload payload={payload} />;
   if (type === "request_board_approval") {
     return <BoardApprovalPayload payload={payload} hideTitle={hidePrimaryTitle} />;
   }

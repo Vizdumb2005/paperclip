@@ -41,3 +41,8 @@ export { instanceSettingsRoutes } from "./instance-settings.js";
 export { instanceDatabaseBackupRoutes } from "./instance-database-backups.js";
 export { managedAgentProfileRoutes } from "./managed-agent-profiles.js";
 export { remoteAgentProfileRoutes } from "./remote-agent-profiles.js";
+export { companyMemoryRoutes } from "./company-memory.js";
+export { workQueueRoutes } from "./work-queues.js";
+export { ceoChatRoutes } from "./ceo-chat.js";
+export { ticketOnRampRoutes } from "./ticket-on-ramps.js";
+export { selfOrganizationRoutes } from "./self-organization.js";

@@ -6,7 +6,7 @@
   "categories": [
     "developer"
   ],
-  "featured": false,
+  "featured": true,
   "branding": {
     "logoUrl": "/brands/apps/vercel.svg",
     "darkLogoUrl": "/brands/apps/vercel-dark.svg"
@@ -14,6 +14,8 @@
   "urlPatterns": [
     "https://mcp.vercel.com/*"
   ],
+  "docsUrl": "https://vercel.com/docs/rest-api",
+  "redirectConstraints": "https-or-loopback-http",
   "methods": [
     {
       "key": "mcp-oauth",
@@ -23,7 +25,7 @@
         "customer",
         "dcr"
       ],
-      "whenToUse": "Use the provider-hosted connection for the quickest setup.",
+      "whenToUse": "Use browser sign-in for the provider-hosted MCP server.",
       "defaults": {
         "serverUrl": "https://mcp.vercel.com/mcp"
       },
@@ -34,10 +36,43 @@
         "project",
         "environment"
       ]
+    },
+    {
+      "key": "mcp-api-key",
+      "transport": "mcp_remote",
+      "auth": "api_key",
+      "ownershipModes": [
+        "customer"
+      ],
+      "whenToUse": "Use a Vercel personal access token or team token.",
+      "defaults": {
+        "serverUrl": "https://mcp.vercel.com/mcp"
+      },
+      "guidanceMd": "Create an Access Token in Vercel Account Settings > Tokens and configure team/project scope.",
+      "riskTier": "S3",
+      "label": "Use an API token",
+      "consoleLinks": {
+        "register": "https://vercel.com/account/tokens",
+        "docs": "https://vercel.com/docs/rest-api"
+      },
+      "credentialFields": [
+        {
+          "key": "authorization",
+          "label": "Vercel Access Token",
+          "type": "password",
+          "required": true,
+          "placeholder": "Bearer token from Vercel Account Settings > Tokens",
+          "secretRef": "company_secrets"
+        }
+      ],
+      "requiredResourceFilters": [
+        "team",
+        "project",
+        "environment"
+      ]
     }
   ],
   "availability": {
-    "available": false,
-    "reason": "Vercel currently reviews and approves MCP clients."
+    "available": true
   }
 }

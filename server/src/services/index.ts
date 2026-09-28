@@ -217,3 +217,21 @@ export {
   type RemoteAgentProfileInput,
   type RemoteAgentService,
 } from "./remote-agent-profiles.js";
+export { companyMemoryService } from "./company-memory.js";
+export { workQueueService, classifyWithLaya } from "./work-queues.js";
+export {
+  parseMarkdownLayout,
+  chunkSections,
+  scoreBm25,
+  reciprocalRankFusion,
+} from "./stratum-engine.js";
+export {
+  MaximizerCircuitBreaker,
+  verifyRunRequirements,
+  DEFAULT_MAXIMIZER_POLICY,
+} from "./maximizer-orchestrator.js";
+export { runVerificationService } from "./run-verification.js";
+export { organizationalLearningService } from "./organizational-learning.js";
+export { selfOrganizationService } from "./self-organization.js";
+export { ceoChatService, parseCeoWorkActions } from "./ceo-chat.js";
+export { ticketOnRampService } from "./ticket-on-ramps.js";

@@ -175,6 +175,10 @@ import {
   projectService,
   routineService,
   workProductService,
+  organizationalLearningService,
+  ticketOnRampService,
+  runVerificationService,
+  companyMemoryService,
 } from "../services/index.js";
 import {
   runnerGoalService,
@@ -13564,6 +13568,48 @@ export function issueRoutes(
       } = { value: null };
       const postCommitActivityPublications: ActivityPublication[] = [];
       const postCommitIssueActions: IssuePostCommitAction[] = [];
+
+      // Maximizer Mode VERIFY gate: an autonomous issue may not be terminalized
+      // without programmatic evidence (a verification command recorded in the run
+      // log, or a registered deliverable work product). Board actors are
+      // full-control operators and keep their existing completion behavior.
+      const completingMaximizerIssue =
+        existing.workMode === "maximizer" &&
+        existing.status !== "done" &&
+        updateFields.status === "done";
+      if (completingMaximizerIssue && actor.actorType !== "user") {
+        const gate = await runVerificationService(db).evaluateCompletionGate(
+          existing.companyId,
+          existing.id,
+        );
+        if (!gate.verified) {
+          await logActivity(db, {
+            companyId: existing.companyId,
+            actorType: actor.actorType,
+            actorId: actor.actorId,
+            agentId: actor.agentId,
+            runId: actor.runId,
+            agentApiKeyId: actor.agentApiKeyId,
+            action: "issue.verification_gate_blocked",
+            entityType: "issue",
+            entityId: existing.id,
+            details: {
+              identifier: existing.identifier,
+              reason: gate.missingRequirement,
+              verificationCommands: gate.evidence.verificationCommands,
+              deliverableTitles: gate.evidence.deliverableTitles,
+            },
+          });
+          res.status(422).json({
+            error:
+              gate.missingRequirement ??
+              "Maximizer Mode requires programmatic verification before completion.",
+            code: "maximizer_verification_required",
+          });
+          return;
+        }
+      }
+
       const issueUpdateData = {
         ...updateFields,
         actorAgentId: actor.agentId ?? null,
@@ -14294,6 +14340,54 @@ export function issueRoutes(
             });
           }
         }
+
+        // Automatic Organizational Learning: distill completed work into memory & playbooks
+        void (async () => {
+          const verificationSvc = runVerificationService(db);
+          const evidence = await verificationSvc.collectVerificationEvidence(
+            issue.companyId,
+            issue.id,
+          );
+
+          // Episodic tier: the raw per-run trace of this completion.
+          // agentId is a foreign key, so only record when an agent is known.
+          if (actor.runId && actor.agentId) {
+            await companyMemoryService(db)
+              .recordRunEpisodicMemory(
+                issue.companyId,
+                actor.runId,
+                issue.id,
+                actor.agentId,
+                [
+                  `Completed issue "${issue.title}".`,
+                  evidence.hasRanVerificationCommand
+                    ? `Ran ${evidence.verificationCommands.length} verification command(s).`
+                    : "No verification command recorded in the run log.",
+                  evidence.hasDeliverableArtifact
+                    ? `Deliverables: ${evidence.deliverableTitles.join(", ")}.`
+                    : "No deliverable work product registered.",
+                ].join(" "),
+              )
+              .catch((err) => {
+                logger.warn(
+                  { err, issueId: issue.id },
+                  "Episodic memory recording failed",
+                );
+              });
+          }
+
+          await organizationalLearningService(db)
+            .distillCompletedIssue({
+              companyId: issue.companyId,
+              issueId: issue.id,
+              issueTitle: issue.title,
+              issueDescription: issue.description,
+              runSummary: `Completed by ${actor.actorType} ${actor.actorId}`,
+              verificationResults: evidence.verificationCommands,
+            });
+        })().catch((err) => {
+          logger.warn({ err, issueId: issue.id }, "Automatic organizational learning distillation failed");
+        });
       }
 
       if (
@@ -14917,6 +15011,42 @@ export function issueRoutes(
           !["done", "cancelled"].includes(existing.status) &&
           ["done", "cancelled"].includes(issue.status);
         if (becameTerminal) {
+          // Outbound mirroring: issues that originated from an external ticket
+          // (Linear/Jira/Asana) mirror their terminal status back to the client.
+          if (issue.status === "done") {
+            void ticketOnRampService(db)
+              .mirrorIssueStatusToExternalTicket(issue.companyId, {
+                id: issue.id,
+                title: issue.title,
+                status: issue.status,
+              })
+              .then((mirrored) => {
+                if (!mirrored) return;
+                return logActivity(db, {
+                  companyId: issue.companyId,
+                  actorType: actor.actorType,
+                  actorId: actor.actorId,
+                  agentId: actor.agentId,
+                  runId: actor.runId,
+                  agentApiKeyId: actor.agentApiKeyId,
+                  action: "ticket.mirrored_outbound",
+                  entityType: "external_object",
+                  entityId: mirrored.externalObjectId,
+                  details: {
+                    issueId: issue.id,
+                    identifier: issue.identifier,
+                    status: issue.status,
+                  },
+                });
+              })
+              .catch((err) => {
+                logger.warn(
+                  { err, issueId: issue.id },
+                  "Outbound ticket mirroring failed",
+                );
+              });
+          }
+
           const expiredInteractions = await issueThreadInteractionService(
             db,
           ).expirePendingInteractionsForTerminalIssue(issue, {

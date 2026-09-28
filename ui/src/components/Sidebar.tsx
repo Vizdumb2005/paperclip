@@ -21,6 +21,7 @@ import {
   GanttChartSquare,
   LayoutGrid,
   Users,
+  Brain,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -194,6 +195,8 @@ export function Sidebar({ children }: { children?: ReactNode }) {
 
         <SidebarSection label="Work" collapsible={{ open: workOpen, onOpenChange: setWorkOpen }}>
           <SidebarNavItem to="/issues" label="Tasks" icon={CircleCheck} />
+          <SidebarNavItem to="/work-queues" label="Queues" icon={Layers} />
+          <SidebarNavItem to="/memory" label="Memory" icon={Brain} />
           {streamlinedUiEnabled ? (
             <>
               <SidebarNavItem to="/projects" label="Projects" icon={FolderOpen} />

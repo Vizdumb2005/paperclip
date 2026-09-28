@@ -1069,3 +1069,10 @@ export * from "./chat-channels.js";
 export * from "./chat-github.js";
 
 export * from "./email.js";
+export * from "./company-memory.js";
+export * from "./work-queues.js";
+export * from "./maximizer.js";
+export * from "./organizational-learning.js";
+export * from "./self-organization.js";
+export * from "./ceo-chat.js";
+export * from "./ticket-on-ramps.js";

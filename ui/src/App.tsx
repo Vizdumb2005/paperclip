@@ -50,6 +50,8 @@ import { Artifacts } from "./pages/Artifacts";
 import { GoalDetail } from "./pages/GoalDetail";
 import { Approvals } from "./pages/Approvals";
 import { ApprovalDetail } from "./pages/ApprovalDetail";
+import { WorkQueues } from "./pages/WorkQueues";
+import { CompanyMemory } from "./pages/CompanyMemory";
 import { CompanyActivity } from "./pages/audit/CompanyActivity";
 import { AuditHub } from "./pages/audit/AuditHub";
 import { Inbox } from "./pages/Inbox";
@@ -376,6 +378,8 @@ function boardRoutes(streamlinedUiEnabled: boolean) {
       <Route path="goals" element={<Goals />} />
       <Route path="goals/:goalId" element={<GoalDetail />} />
       <Route path="artifacts" element={<Artifacts />} />
+      <Route path="work-queues" element={<WorkQueues />} />
+      <Route path="memory" element={<CompanyMemory />} />
       <Route path="approvals" element={<Navigate to="/approvals/pending" replace />} />
       <Route path="approvals/pending" element={<Approvals />} />
       <Route path="approvals/all" element={<Approvals />} />

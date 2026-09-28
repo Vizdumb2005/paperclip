@@ -22,3 +22,8 @@ export { resourceMembershipsApi } from "./resourceMemberships";
 export { inboxDismissalsApi } from "./inboxDismissals";
 export { companySkillsApi } from "./companySkills";
 export { chatEndpointsApi } from "./chatEndpoints";
+export { workQueuesApi } from "./workQueues";
+export { companyMemoryApi } from "./companyMemory";
+export { ceoChatApi } from "./ceoChat";
+export { selfOrganizationApi } from "./selfOrganization";
+export { ticketOnRampsApi } from "./ticketOnRamps";

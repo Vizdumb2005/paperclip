@@ -33,6 +33,7 @@ export const CONNECTABLE_APP_SLUGS = new Set([
   "microsoft-teams",
   "telegram",
   "imessage-photon",
+  "vercel",
 ]);
 
 export const CONNECTABLE_APP_DEFINITIONS = APP_DEFINITIONS.filter((app) =>

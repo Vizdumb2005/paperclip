@@ -1,23 +1,17 @@
-import type { CeoChatTurnResult } from "@paperclipai/shared";
+import type { ResolvedWorkAction } from "@paperclipai/shared";
 import { api } from "./client";
 
+// Aligned to the mounted server contract in server/src/routes/ceo-chat.ts
+// (resolve + execute). Do not invent new paths here without adding the
+// matching server route first.
 export const ceoChatApi = {
-  sendMessage: (
-    companyId: string,
-    message: string,
-    history?: Array<{ role: "user" | "assistant"; content: string }>,
-  ) =>
-    api.post<CeoChatTurnResult>(`/companies/${companyId}/ceo-chat/message`, {
+  resolveActions: (companyId: string, message: string) =>
+    api.post<{ actions: ResolvedWorkAction[] }>(`/companies/${companyId}/ceo-chat/resolve`, {
       message,
-      history,
     }),
-  executeAction: (
-    companyId: string,
-    actionCardId: string,
-    actionPayload?: Record<string, unknown>,
-  ) =>
-    api.post<{ executed: boolean; result: unknown }>(
-      `/companies/${companyId}/ceo-chat/actions/${actionCardId}/execute`,
-      { actionPayload },
+  executeAction: (companyId: string, action: ResolvedWorkAction) =>
+    api.post<{ createdId: string; type: ResolvedWorkAction["actionType"] }>(
+      `/companies/${companyId}/ceo-chat/execute`,
+      { action },
     ),
 };

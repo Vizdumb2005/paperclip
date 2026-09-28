@@ -300,6 +300,42 @@ const SUMMARIZER_SKILL = readBuiltInTextWithFallback(
   FALLBACK_SUMMARIZER_SKILL,
 );
 
+const FALLBACK_UPSTREAM_SYNC_INSTRUCTIONS = [
+  "You are Upstream Sync, a built-in maintenance agent at Paperclip.",
+  "",
+  "Merge the upstream paperclipai/paperclip repository into this fork on a branch, committing only files that merge without conflicts. Use the `upstream-sync` skill as your operating procedure.",
+  "",
+  "Sync direction is upstream to fork only. Conflicted files keep the fork's bytes and go on the skipped list for a human. Never push to upstream.",
+  "",
+].join("\n");
+
+const FALLBACK_UPSTREAM_SYNC_ROUTINE = [
+  "Merge upstream into the fork on a branch, committing only conflict-free files.",
+  "",
+  "Paused by default; spends no tokens until an operator enables the schedule or runs it manually. Opens a PR for merged files and an issue for skipped ones.",
+  "",
+].join("\n");
+
+const FALLBACK_UPSTREAM_SYNC_SKILL = [
+  "---",
+  "name: upstream-sync",
+  "description: Merge upstream paperclipai/paperclip into the fork, committing only conflict-free files and reporting the rest.",
+  "key: paperclipai/bundled/paperclip-operations/upstream-sync",
+  "---",
+  "",
+  "# Upstream Sync",
+  "",
+  "Run the deterministic helper, push the branch to the fork, open a PR for merged files and an issue for skipped ones. Never push to upstream; never resolve conflicts by hand.",
+  "",
+].join("\n");
+
+const UPSTREAM_SYNC_INSTRUCTIONS = readBuiltInText("upstream-sync/AGENTS.md", FALLBACK_UPSTREAM_SYNC_INSTRUCTIONS);
+const UPSTREAM_SYNC_ROUTINE = readBuiltInText(
+  "upstream-sync/routines/weekly-upstream-sync.md",
+  FALLBACK_UPSTREAM_SYNC_ROUTINE,
+);
+const UPSTREAM_SYNC_SKILL = readBuiltInText("upstream-sync/SKILL.md", FALLBACK_UPSTREAM_SYNC_SKILL);
+
 const DEFINITIONS = validateBuiltInAgentDefinitions([
   {
     key: "briefs",
@@ -461,6 +497,65 @@ const DEFINITIONS = validateBuiltInAgentDefinitions([
             label: "Daily stale-summary refresh",
             enabled: false,
             cronExpression: "0 8 * * *",
+            timezone: "UTC",
+          },
+        ],
+      },
+    },
+  },
+  {
+    key: "upstream-sync",
+    displayName: "Upstream Sync",
+    featureKeys: ["upstream-sync"],
+    shortPurpose:
+      "Merges upstream paperclip into the fork weekly, committing only conflict-free files and filing skipped ones for manual review.",
+    defaultInstructions: UPSTREAM_SYNC_INSTRUCTIONS,
+    defaultRole: "general",
+    defaultTitle: "Upstream Sync",
+    defaultIcon: "git-merge",
+    defaultPermissions: {
+      canCreateAgents: false,
+      canCreateSkills: false,
+    },
+    defaultStatus: "paused",
+    defaultManager: "single_root_agent",
+    allowedAdapterTypes: ["claude_local", "codex_local", "gemini_local", "opencode_local", "process"],
+    defaultBudgetMonthlyCents: 0,
+    bundle: {
+      stockVersion: "2026-09-28",
+      instructions: {
+        entryFile: "AGENTS.md",
+        files: {
+          "AGENTS.md": UPSTREAM_SYNC_INSTRUCTIONS,
+        },
+      },
+      skill: {
+        skillKey: "upstream-sync",
+        displayName: "Upstream Sync",
+        slug: "upstream-sync",
+        canonicalKey: "paperclipai/bundled/paperclip-operations/upstream-sync",
+        files: {
+          "upstream-sync/SKILL.md": UPSTREAM_SYNC_SKILL,
+        },
+      },
+      routine: {
+        routineKey: "weekly-upstream-sync",
+        title: "Merge upstream paperclip into the fork (conflict-free files only)",
+        description: UPSTREAM_SYNC_ROUTINE,
+        status: "paused",
+        priority: "medium",
+        concurrencyPolicy: "coalesce_if_active",
+        catchUpPolicy: "skip_missed",
+        variables: [
+          { name: "upstreamRemote", label: "Upstream remote name", type: "text", defaultValue: "upstream", required: true, options: [] },
+          { name: "upstreamBranch", label: "Upstream branch", type: "text", defaultValue: "master", required: true, options: [] },
+        ],
+        triggers: [
+          {
+            kind: "schedule",
+            label: "Weekly upstream sync",
+            enabled: false,
+            cronExpression: "0 9 * * 1",
             timezone: "UTC",
           },
         ],

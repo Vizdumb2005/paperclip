@@ -169,7 +169,15 @@ describeEmbeddedPostgres("built-in agents", () => {
 
   it("validates the static registry and rejects invalid definitions", () => {
     const definitions = listBuiltInAgentDefinitions();
-    expect(definitions.map((definition) => definition.key).sort()).toEqual(["briefs", "learning", "reflection-coach", "summarizer"]);
+    expect(definitions.map((definition) => definition.key).sort()).toEqual(["briefs", "learning", "reflection-coach", "summarizer", "upstream-sync"]);
+    const upstreamSync = definitions.find((definition) => definition.key === "upstream-sync");
+    expect(upstreamSync?.bundle?.routine).toMatchObject({
+      routineKey: "weekly-upstream-sync",
+      status: "paused",
+    });
+    expect(upstreamSync?.bundle?.routine.triggers).toMatchObject([
+      { kind: "schedule", enabled: false, cronExpression: "0 9 * * 1", timezone: "UTC" },
+    ]);
     const summarizer = definitions.find((definition) => definition.key === "summarizer");
     expect(summarizer).toMatchObject({
       defaultAdapterType: "claude_local",

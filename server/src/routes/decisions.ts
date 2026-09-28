@@ -18,6 +18,7 @@ import { authorizationDeniedDetails, authorizationService } from "../services/au
 import { canReadDecisionSource } from "../services/decision-queues.js";
 import { hashAttentionArchiveManifest } from "../services/decision-retention.js";
 import { forbidden, unprocessable } from "../errors.js";
+import { instanceSettingsService } from "../services/instance-settings.js";
 
 const createSchema = z.object({
   title: z.string().trim().min(1).max(500),
@@ -51,6 +52,17 @@ function boardUserId(req: Parameters<typeof getActorInfo>[0]) {
 
 export function decisionRoutes(db: Db, options: DecisionServiceOptions) {
   const router = Router();
+
+  // Matches the sidebar gate (`enableDecisions`): the routes forbid when the
+  // flag is off so a direct URL cannot reach a hidden surface.
+  router.use(async (_req, _res, next) => {
+    const experimental = await instanceSettingsService(db).getExperimental();
+    if (!experimental.enableDecisions) {
+      next(forbidden("Decisions are disabled"));
+      return;
+    }
+    next();
+  });
   const svc = decisionService(db, options);
   router.post(
     "/companies/:companyId/decision-archive-proposals",

@@ -10,6 +10,7 @@ import {
   updateDecisionTriageSchema,
 } from "@paperclipai/shared";
 import { forbidden } from "../errors.js";
+import { instanceSettingsService } from "../services/instance-settings.js";
 import { validate } from "../middleware/validate.js";
 import {
   authorizationDeniedDetails,
@@ -67,6 +68,17 @@ export function decisionQueueRoutes(db: Db) {
   const router = Router();
   const svc = decisionQueueService(db);
   const retention = decisionRetentionService(db);
+
+  // Matches the sidebar gate (`enableDecisions`): the routes forbid when the
+  // flag is off so a direct URL cannot reach a hidden surface.
+  router.use(async (_req, _res, next) => {
+    const experimental = await instanceSettingsService(db).getExperimental();
+    if (!experimental.enableDecisions) {
+      next(forbidden("Decisions are disabled"));
+      return;
+    }
+    next();
+  });
 
   router.get("/companies/:companyId/decision-queue-seed-rules", async (req, res) => {
     const companyId = req.params.companyId as string;

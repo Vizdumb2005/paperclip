@@ -23,6 +23,7 @@ import {
 } from "./helpers/embedded-postgres.js";
 import { errorHandler } from "../middleware/index.js";
 import { decisionTrainingRoutes } from "../routes/decision-training.js";
+import { instanceSettingsService } from "../services/instance-settings.js";
 import { attentionService } from "../services/attention.js";
 import { captureDecisionSnapshot, decisionTrainingService } from "../services/decision-training.js";
 
@@ -42,6 +43,7 @@ describeEmbeddedPostgres("decision training", () => {
   beforeAll(async () => {
     tempDb = await startEmbeddedPostgresTestDatabase("paperclip-decision-training-");
     db = createDb(tempDb.connectionString);
+    await instanceSettingsService(db).updateExperimental({ enableDecisions: true });
   }, 30_000);
 
   afterEach(async () => {
@@ -321,6 +323,29 @@ describeEmbeddedPostgres("decision training", () => {
     const feed = await attentionService(db).list(seeded.companyId, { userId: "board-user" });
     const item = feed.items.find((candidate) => candidate.subject.id === seeded.interactionId);
     expect(item?.trainingExampleId).toBe(example.id);
+  });
+
+  it("forbids decision training routes when enableDecisions is off", async () => {
+    const seeded = await seedResolvedInteraction();
+    const app = express();
+    app.use(express.json());
+    app.use((req, _res, next) => {
+      req.actor = { type: "board", userId: "board-user", source: "local_implicit" };
+      next();
+    });
+    app.use("/api", decisionTrainingRoutes(db));
+    app.use(errorHandler);
+
+    await instanceSettingsService(db).updateExperimental({ enableDecisions: false });
+    try {
+      await request(app)
+        .post(`/api/companies/${seeded.companyId}/decision-training`)
+        .send({})
+        .expect(403);
+      await request(app).get("/api/decision-training/not-a-uuid").expect(403);
+    } finally {
+      await instanceSettingsService(db).updateExperimental({ enableDecisions: true });
+    }
   });
 
   it("does not log a notes update when the submitted notes are unchanged", async () => {

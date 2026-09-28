@@ -25,6 +25,7 @@ import {
 import { errorHandler } from "../middleware/index.js";
 import { decisionQueueRoutes } from "../routes/decision-queues.js";
 import { decisionQueueService } from "../services/decision-queues.js";
+import { instanceSettingsService } from "../services/instance-settings.js";
 
 const embeddedPostgresSupport = await getEmbeddedPostgresTestSupport();
 const describeEmbeddedPostgres = embeddedPostgresSupport.supported ? describe : describe.skip;
@@ -42,6 +43,7 @@ describeEmbeddedPostgres("decision queue routes", () => {
   beforeAll(async () => {
     tempDb = await startEmbeddedPostgresTestDatabase("paperclip-decision-queues-");
     db = createDb(tempDb.connectionString);
+    await instanceSettingsService(db).updateExperimental({ enableDecisions: true });
   }, 30_000);
 
   afterEach(async () => {
@@ -143,6 +145,21 @@ describeEmbeddedPostgres("decision queue routes", () => {
       runId: null,
     };
   }
+
+  it("forbids decision queue routes when enableDecisions is off", async () => {
+    const { companyId } = await seed();
+    const board = boardActor(companyId);
+    await instanceSettingsService(db).updateExperimental({ enableDecisions: false });
+    try {
+      await request(app(board)).get(`/api/companies/${companyId}/decision-queues`).expect(403);
+      await request(app(board))
+        .post(`/api/companies/${companyId}/decision-queues`)
+        .send({ key: "k", title: "T" })
+        .expect(403);
+    } finally {
+      await instanceSettingsService(db).updateExperimental({ enableDecisions: true });
+    }
+  });
 
   it("creates idempotently, patches, lists by updated time, and audits queue mutations", async () => {
     const { companyId } = await seed();

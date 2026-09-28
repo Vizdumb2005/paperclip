@@ -2,6 +2,8 @@ import { Router, type Request, type Response } from "express";
 import { z } from "zod";
 import type { Db } from "@paperclipai/db";
 import { validate } from "../middleware/validate.js";
+import { forbidden } from "../errors.js";
+import { instanceSettingsService } from "../services/instance-settings.js";
 import { decisionTrainingService, logActivity } from "../services/index.js";
 import { assertBoard, assertCompanyAccess, getActorInfo, hasCompanyAccess } from "./authz.js";
 
@@ -52,6 +54,17 @@ function requireExampleOwner(res: Response, userId: string, createdByUserId: str
 export function decisionTrainingRoutes(db: Db) {
   const router = Router();
   const svc = decisionTrainingService(db);
+
+  // Matches the sidebar gate (`enableDecisions`): the routes 404/forbid when
+  // the flag is off so a direct URL cannot reach a hidden surface.
+  router.use(async (_req, _res, next) => {
+    const experimental = await instanceSettingsService(db).getExperimental();
+    if (!experimental.enableDecisions) {
+      next(forbidden("Decisions are disabled"));
+      return;
+    }
+    next();
+  });
 
   router.post(
     "/companies/:companyId/decision-training",

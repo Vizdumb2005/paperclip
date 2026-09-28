@@ -47,3 +47,19 @@ Paperclip transforms the solo operator into the **Board of Directors** of an aut
 - **Board Approval Gates**: Crucial milestones—such as deploying to client production, spending above budget thresholds, or sending final deliverables—require explicit board sign-off.
 - **Institutional Memory (Stratum RAG)**: Client preferences, style guides, domain decisions, and historical resolutions are preserved in tiered memory and hydrated into task prompts, ensuring work always aligns with client expectations.
 - **Automatic Organizational Learning**: Successfully completed projects are automatically distilled into reusable Markdown playbooks, permanently leveling up the virtual workforce's capabilities.
+
+---
+
+## This fork's direction
+
+On top of the mission above, this fork commits to three things upstream does not:
+
+1. **Model-agnostic choice.** Every implemented adapter is reachable, not just
+   Claude and Codex — onboarding offers all providers, imports preserve the
+   source adapter instead of downgrading it.
+2. **Staying current.** A weekly upstream-sync routine merges
+   `paperclipai/paperclip` into the fork, committing only conflict-free files
+   and filing the rest for review — the fork never rots.
+3. **Desktop-first.** A Windows Electron app (`desktop/`) with embedded
+   server, tray, and installer-grade icon is a first-class distribution
+   surface, not an afterthought.

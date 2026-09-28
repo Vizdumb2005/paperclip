@@ -76,3 +76,21 @@ The product roadmap bridges Paperclip's autonomous company control plane with th
 ### 2.4 Multi-Modal Deliverable Verification
 - **Visual Regression Proofs**: Headless browser screenshot captures and visual diffing for web deliverables before human sign-off.
 - **Automated Smoke Reports**: Generation of self-contained HTML/Markdown deliverable packages linking test evidence, generated artifacts, and verification audits.
+
+---
+
+## Phase 3: Ecosystem depth & cleanup (fork, interleaved by value)
+
+1. **Telemetry adoption/health view.** Read-only dashboard over the 15
+   already-emitted events (`agent.created`, `routine.run`, …). No new
+   instrumentation.
+2. **Optional skills gallery + content-machine.** Surface the ~9 optional
+   catalog skills during hire and the `content-machine` team in onboarding.
+3. **Chat + sandbox connect UIs.** Expose Discord/Teams/Telegram/GitHub
+   connect tiles (adapters exist) and a sandbox-provider picker
+   (daytona/modal/e2b/k8s manifests exist) in execution setup.
+4. **Plugin `dashboardWidget` sample.** One shipped sample proving the slot
+   system end to end.
+5. **Dead-code deletion batch.** Orphan `MyIssues`/`ArtifactsPanel`, unrouted
+   `InviteUxLab`/`IssueChatUxLab`, showcase-only components, dead `setCwd`,
+   write-only `onboarding-seed` path.

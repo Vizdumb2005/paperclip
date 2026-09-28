@@ -45,7 +45,7 @@ Paperclip is designed as a modular, high-performance monorepo separated into a c
 ## 3. Database & Storage Layer (`packages/db/`)
 
 - **Primary Database**: PostgreSQL 16+ (Production)
-- **Zero-Config Local Dev Database**: Embedded `@electric-sql/pglite` (requires no external PostgreSQL installation)
+- **Zero-Config Local Dev Database**: Embedded PostgreSQL (`@embedded-postgres`, requires no external PostgreSQL installation)
 - **ORM**: Drizzle ORM (type-safe SQL builder and relations)
 - **Migrations**: Automated schema migrations via Drizzle Kit (`packages/db/src/migrations/`)
 - **Key Schema Entities**:
@@ -99,3 +99,24 @@ Paperclip is designed as a modular, high-performance monorepo separated into a c
 - **Token Verification**: Custom AST token validator (`scripts/check-token-gates.mjs`) ensuring 100% adherence to design tokens
 - **Packaging & Containerization**: Multi-stage Dockerfile (`Dockerfile`) supporting PGlite dev and PostgreSQL production deployments
 - **Cross-Platform Compatibility**: Full Windows, macOS, and Linux compatibility for scripts and native binaries
+
+---
+
+## 7. Desktop app (`desktop/`)
+
+- **Framework**: Electron 33 (main + splash + tray processes, `dist/main.cjs` bundle)
+- **Startup**: `ServerManager` spawns the control plane or attaches to a healthy
+  instance on port 3100, with fail-fast errors for occupied ports and missing
+  bundles; splash window (never always-on-top) closes once the main window loads
+- **Packaging**: `electron-builder` Windows `dir`/`portable` targets with an
+  embedded multi-size paperclip `.ico` (exe icon, tray icon, installer)
+
+---
+
+## 8. Fork infrastructure
+
+- **Weekly upstream sync**: `scripts/upstream-sync.mjs` (deterministic,
+  conflict-safe merge helper — conflicted files keep fork bytes and are
+  reported as skipped) driven by the `weekly-upstream-sync` built-in routine
+  (cron `0 9 * * 1` UTC, paused by default), which opens the PR and the
+  skipped-files tracking issue

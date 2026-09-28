@@ -1,6 +1,7 @@
 import { Router } from "express";
 import type { Db } from "@paperclipai/db";
 import { dashboardService } from "../services/dashboard.js";
+import { telemetryAdoptionService } from "../services/telemetry-adoption.js";
 import {
   DEFAULT_RECOVERY_RATE_THRESHOLD_PERCENT,
   MAX_WINDOW_WEEKS,
@@ -22,6 +23,7 @@ function parsePositiveNumber(
 export function dashboardRoutes(db: Db) {
   const router = Router();
   const svc = dashboardService(db);
+  const adoption = telemetryAdoptionService(db);
   const recoveryObservability = recoveryObservabilityService(db);
 
   router.get("/companies/:companyId/dashboard", async (req, res) => {
@@ -29,6 +31,12 @@ export function dashboardRoutes(db: Db) {
     assertCompanyAccess(req, companyId);
     const summary = await svc.summary(companyId);
     res.json(summary);
+  });
+
+  router.get("/companies/:companyId/telemetry-adoption", async (req, res) => {
+    const companyId = req.params.companyId as string;
+    assertCompanyAccess(req, companyId);
+    res.json(await adoption.summary(companyId));
   });
 
   router.get("/companies/:companyId/recovery-observability", async (req, res) => {

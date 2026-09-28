@@ -907,6 +907,11 @@ export type {
 export type { LiveEvent } from "./live.js";
 export type { DashboardRunActivityDay, DashboardSummary } from "./dashboard.js";
 export type {
+  TelemetryAdoptionDayBucket,
+  TelemetryAdoptionEventEntry,
+  TelemetryAdoptionSummary,
+} from "./telemetry-adoption.js";
+export type {
   TimelineActorType,
   TimelineEventKind,
   TimelineEdgeKind,

@@ -5161,8 +5161,8 @@ for (const segment of costSummaryPaths) {
     tags: ["costs"],
     summary: `Cost report: ${segment}`,
     request: { params: z.object({ companyId: z.string() }) },
-    responses: { 200: r.ok(), 401: r.unauthorized },
-  });
+  responses: { 200: r.ok(), 401: r.unauthorized },
+});
 }
 
 registry.registerPath({
@@ -5400,6 +5400,15 @@ registry.registerPath({
       threshold: z.string().optional(),
     }),
   },
+  responses: { 200: r.ok(), 401: r.unauthorized },
+});
+
+registry.registerPath({
+  method: "get",
+  path: "/api/companies/{companyId}/telemetry-adoption",
+  tags: ["dashboard"],
+  summary: "Get telemetry adoption/health proxy counts",
+  request: { params: z.object({ companyId: z.string() }) },
   responses: { 200: r.ok(), 401: r.unauthorized },
 });
 

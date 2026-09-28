@@ -479,6 +479,12 @@ export function Dashboard() {
             itemClassName="rounded-lg border bg-card p-4 shadow-sm"
           />
 
+          <div className="flex justify-end">
+            <Link to="/dashboard/adoption" className="text-sm text-muted-foreground underline underline-offset-2">
+              Adoption & health
+            </Link>
+          </div>
+
           <div className="grid md:grid-cols-2 gap-4">
             {/* Recent Activity */}
             {recentActivity.length > 0 && (

@@ -1152,9 +1152,32 @@ function OnboardingWizardInner({
    * A source chosen from the visible row. Read off the row rather than off
    * `adapterType` alone, because a restored draft can name an adapter this step
    * no longer offers — a selection the customer cannot see.
+   *
+   * The row is the recommended tiles plus the disclosed "More options" tiles.
+   * `comingSoon` adapters are offerable by neither: the snap effect below
+   * already treats them as invisible, so the gate agrees with it.
    */
+  const choosableMoreAdapters = moreAdapters.filter((a) => !a.comingSoon);
+  const pickedFromMore =
+    sourcePicked && choosableMoreAdapters.some((opt) => opt.type === adapterType);
   const sourceSelected =
-    sourcePicked && recommendedAdapters.some((opt) => opt.type === adapterType);
+    sourcePicked &&
+    (recommendedAdapters.some((opt) => opt.type === adapterType) ||
+      choosableMoreAdapters.some((opt) => opt.type === adapterType));
+
+  /**
+   * One pick path for both tile rows. The row is the question and answering
+   * it starts the sign-in; a press mid-flow is ignored rather than honoured.
+   */
+  const handleSourceSelect = (id: string) => {
+    if (connectPhase !== "idle") return;
+    autoConnectStartedRef.current = false;
+    setSourcePicked(true);
+    setAdapterType(id);
+    if (id === "opencode_local") setModel(DEFAULT_OPENCODE_LOCAL_MODEL);
+    else if (id !== "codex_local") setModel("");
+    setConnectPhase("collapsing");
+  };
 
   /**
    * Whether the connect step may advance.
@@ -2668,8 +2691,17 @@ function OnboardingWizardInner({
                         someone marks one rather than the day someone
                         remembers to edit this file.
 
+                        Everything else lives behind the "More options"
+                        disclosure below, which renders `moreAdapters` in a
+                        second row through the same tiles and the same pick
+                        path. Once a sign-in is running the row that was not
+                        picked unmounts: the choice is made, and leaving the
+                        other row on screen would invite a press that has to
+                        be refused.
+
                         Picking one starts the sign-in now. The row is the
                         question, and answering it is what opens the card. */}
+                    {!(connectCollapsed && pickedFromMore) && (
                     <ModelSourceTiles
                       label="Model source"
                       sources={recommendedAdapters.map((opt) => ({
@@ -2686,16 +2718,42 @@ function OnboardingWizardInner({
                       }
                       collapsed={connectCollapsed}
                       settling={connectPhase === "unwindRow"}
-                      onSelect={(id) => {
-                        if (connectPhase !== "idle") return;
-                        autoConnectStartedRef.current = false;
-                        setSourcePicked(true);
-                        setAdapterType(id);
-                        if (id === "opencode_local") setModel(DEFAULT_OPENCODE_LOCAL_MODEL);
-                        else if (id !== "codex_local") setModel("");
-                        setConnectPhase("collapsing");
-                      }}
+                      onSelect={handleSourceSelect}
                     />
+                    )}
+
+                    {choosableMoreAdapters.length > 0 && !(connectCollapsed && !pickedFromMore) && (
+                      <div className="pt-1">
+                        <button
+                          type="button"
+                          aria-expanded={showMoreAdapters}
+                          onClick={() => setShowMoreAdapters((v) => !v)}
+                          className="flex items-center gap-1 rounded-sm text-sm text-muted-foreground outline-none transition-colors hover:text-foreground focus-visible:ring-ring/50 focus-visible:ring-(length:--rad-3)"
+                        >
+                          More options
+                          <ChevronDown
+                            className={cn("size-4 transition-transform", showMoreAdapters && "rotate-180")}
+                          />
+                        </button>
+                        {showMoreAdapters && (
+                          <div className="pt-3">
+                            <ModelSourceTiles
+                              label="More model sources"
+                              sources={choosableMoreAdapters.map((opt) => ({
+                                id: opt.type,
+                                label: CONNECT_SOURCE_NAMES[opt.type] ?? opt.label,
+                                icon: <ModelSourceMark type={opt.type} Fallback={opt.icon} />,
+                              }))}
+                              mode={credentialMode}
+                              selectedId={pickedFromMore ? adapterType : null}
+                              collapsed={connectCollapsed}
+                              settling={connectPhase === "unwindRow"}
+                              onSelect={handleSourceSelect}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
 
                     {/* Fades on the first beat but keeps its space until the
                         second, so pressing a tile moves nothing vertically.

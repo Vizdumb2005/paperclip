@@ -2085,6 +2085,46 @@ describe("OnboardingWizard restore-gate (stale localStorage across accounts)", (
       await act(async () => root.unmount());
     });
 
+    it("offers More options that reveals the non-recommended adapters", async () => {
+      mockAdapterRegistry.list = [{ type: "claude_local" }, { type: "codex_local" }, { type: "opencode_local" }];
+      const { root } = await openStep4({ adapterType: "claude_local" });
+
+      const disclosure = [...document.body.querySelectorAll("button")].find(
+        (button) => button.textContent?.trim().startsWith("More options"),
+      );
+      expect(disclosure, "a More options disclosure should render").toBeTruthy();
+      expect(
+        [...document.body.querySelectorAll("button[aria-checked]")].some((tile) =>
+          (tile.textContent ?? "").includes("opencode_local"),
+        ),
+        "non-recommended adapters stay hidden until disclosed",
+      ).toBe(false);
+
+      await act(async () => { disclosure!.click(); });
+      const tiles = [...document.body.querySelectorAll("button[aria-checked]")];
+      expect(tiles.length, "recommended row plus disclosed row").toBe(3);
+
+      await act(async () => root.unmount());
+    });
+
+    it("counts a disclosed non-recommended adapter as the selected source", async () => {
+      mockAdapterRegistry.list = [{ type: "claude_local" }, { type: "codex_local" }, { type: "opencode_local" }];
+      const { root } = await openStep4({ adapterType: "claude_local" });
+
+      const disclosure = [...document.body.querySelectorAll("button")].find(
+        (button) => button.textContent?.trim().startsWith("More options"),
+      );
+      await act(async () => { disclosure!.click(); });
+      const opencodeTile = [...document.body.querySelectorAll("button[aria-checked]")].find(
+        (tile) => (tile.textContent ?? "").includes("opencode_local"),
+      );
+      expect(opencodeTile, "disclosed adapter should be pickable").toBeTruthy();
+      await act(async () => { (opencodeTile as HTMLButtonElement).click(); });
+      expect(opencodeTile!.getAttribute("aria-checked")).toBe("true");
+
+      await act(async () => root.unmount());
+    });
+
     it("will not advance on a saved adapter the step no longer offers", async () => {
       // A draft can name an adapter this registry does not carry — a cloud
       // sandbox without claude_local, an adapter since disabled. The row hides

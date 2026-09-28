@@ -1,0 +1,52 @@
+{
+  "name": "@paperclipai/desktop",
+  "version": "0.3.1",
+  "description": "Paperclip Desktop — Windows native AI agent control plane application",
+  "author": "Paperclip AI",
+  "private": true,
+  "main": "dist/main.cjs",
+  "scripts": {
+    "build:main": "node scripts/build.mjs",
+    "build": "pnpm run build:main",
+    "typecheck": "tsc --noEmit",
+    "start": "electron .",
+    "pack:dir": "pnpm run build && electron-builder --dir",
+    "dist:win": "pnpm run build && electron-builder --win --x64"
+  },
+  "build": {
+    "appId": "ai.paperclip.desktop",
+    "productName": "Paperclip",
+    "directories": {
+      "output": "release"
+    },
+    "win": {
+      "target": [
+        "dir",
+        "portable"
+      ],
+      "icon": "assets/icon.ico"
+    },
+    "forceCodeSigning": false,
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "shortcutName": "Paperclip"
+    },
+    "files": [
+      "dist/**/*",
+      "assets/**/*",
+      "splash.html"
+    ]
+  },
+  "dependencies": {
+    "cross-spawn": "^7.0.6",
+    "get-port": "^7.1.0"
+  },
+  "devDependencies": {
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8",
+    "esbuild": "^0.24.2",
+    "typescript": "^5.7.2",
+    "@types/node": "^22.10.2"
+  }
+}

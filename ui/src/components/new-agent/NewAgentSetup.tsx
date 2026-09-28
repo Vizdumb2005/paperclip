@@ -60,6 +60,7 @@ import {
 import { stepMotion } from "../onboarding/onboarding-motion";
 import { RuntimeTestCard, type TestState } from "../RuntimeTestCard";
 import { AgentBasicsDialog, AdapterMark } from "./AgentBasicsDialog";
+import { OptionalSkillsGallery } from "./OptionalSkillsGallery";
 import {
   AgentProviderConnection,
   type ProviderConnection,
@@ -1101,8 +1102,7 @@ function Setup({
                         adapterType,
                       ) && (
                         <section className="space-y-5">
-                          <h3 className="text-sm font-semibold">Environment</h3>
-                          <select
+                          <h3 className="text-sm font-semibold">Environment</h3>                          <select
                             aria-label="Environment"
                             className={controlClass}
                             value={environmentOverride}
@@ -1127,6 +1127,7 @@ function Setup({
                           </select>
                         </section>
                       )}
+                      <OptionalSkillsGallery companyId={companyId} />
                     </fieldset>
                     <RuntimeTestCard
                       state={testState}

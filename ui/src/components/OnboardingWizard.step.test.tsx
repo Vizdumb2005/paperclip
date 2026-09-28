@@ -82,6 +82,11 @@ vi.mock("@/lib/router", () => ({
   useLocation: () => ({ pathname: routerState.pathname }),
   useNavigate: () => vi.fn(),
   useParams: () => ({}),
+  Link: ({ to, children, ...rest }: { to: string; children: React.ReactNode }) => (
+    <a href={to} {...rest}>
+      {children}
+    </a>
+  ),
 }));
 
 vi.mock("../context/DialogContext", () => ({

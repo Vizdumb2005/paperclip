@@ -621,7 +621,7 @@ function OnboardingWizardInner({
    */
   const [sourcePicked, setSourcePicked] = useState(false);
   const savedNativeRunnerDraft = saved?.adapterType === "paperclip_runner";
-  const [cwd, setCwd] = useState((saved?.cwd as string) ?? "");
+  const [cwd] = useState((saved?.cwd as string) ?? "");
   // Native drafts may carry provider-specific configuration that is invalid
   // for the legacy adapter selected above. Keep the portable working
   // directory, but clear runner-specific execution fields while restoring.

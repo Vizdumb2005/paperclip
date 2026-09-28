@@ -20,7 +20,6 @@ export {
 } from "./file-resources.js";
 export { routineRoutes } from "./routines.js";
 export { goalRoutes } from "./goals.js";
-export { onboardingSeedRoutes } from "./onboarding-seed.js";
 export { approvalRoutes } from "./approvals.js";
 export { secretRoutes } from "./secrets.js";
 export { toolAccessRoutes } from "./tool-access.js";
@@ -46,3 +45,5 @@ export { workQueueRoutes } from "./work-queues.js";
 export { ceoChatRoutes } from "./ceo-chat.js";
 export { ticketOnRampRoutes } from "./ticket-on-ramps.js";
 export { selfOrganizationRoutes } from "./self-organization.js";
+export { cloudRelayRoutes } from "./cloud-relay.js";
+

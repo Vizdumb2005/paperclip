@@ -764,7 +764,9 @@ describeEmbeddedPostgres("built-in agents", () => {
     });
 
     const pendingReconcile = await reconcileBuiltInAgentsOnStartup(db);
-    expect(pendingReconcile.pendingApprovals).toBe(1);
+    // Two approvals: the on-demand Reflection Coach plus the auto-provisioned
+    // Summarizer (AUTO_PROVISION_ON_COMPANY_CREATE_KEYS).
+    expect(pendingReconcile.pendingApprovals).toBe(2);
     const stillPending = await builtInAgentService(db).get(companyId, "reflection-coach");
     expect(stillPending).toMatchObject({
       status: "pending_approval",
@@ -800,7 +802,9 @@ describeEmbeddedPostgres("built-in agents", () => {
     const agentRows = await db.select().from(agents).where(eq(agents.companyId, companyId));
     expect(agentRows.filter((row) => readBuiltInAgentMarker(row.metadata)?.key === "reflection-coach")).toHaveLength(1);
     const approvalRows = await db.select().from(approvals).where(eq(approvals.companyId, companyId));
-    expect(approvalRows).toHaveLength(1);
+    // Two rows: the approved Reflection Coach hire plus the still-pending
+    // auto-provisioned Summarizer hire.
+    expect(approvalRows).toHaveLength(2);
   });
 
   it("preserves Reflection Coach instruction drift on reconcile and restores it on reset", async () => {

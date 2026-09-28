@@ -72,7 +72,7 @@ describe("applyManagedExperimentalOverlay", () => {
     // managed overlay > schema default
     expect(experimental.enablePipelines).toBe(true);
     // unmanaged keys keep their stored/default values
-    expect(experimental.enableCases).toBe(false);
+    expect(experimental.enableCases).toBe(true);
     expect(managedKeys).toEqual({
       enablePipelines: { managed: true, managedBy: "paperclip-cloud" },
     });

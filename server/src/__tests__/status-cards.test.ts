@@ -134,9 +134,14 @@ describeEmbeddedPostgres("status card routes", () => {
 
   it("returns 404 while the experimental flag is disabled", async () => {
     const company = await seedCompany();
-    const response = await request(createApp(db, localBoardActor())).get(`/api/companies/${company.id}/status-cards`);
-    expect(response.status).toBe(404);
-    expect(response.body.error).toContain("not enabled");
+    await instanceSettingsService(db).updateExperimental({ enableStatusCards: false });
+    try {
+      const response = await request(createApp(db, localBoardActor())).get(`/api/companies/${company.id}/status-cards`);
+      expect(response.status).toBe(404);
+      expect(response.body.error).toContain("not enabled");
+    } finally {
+      await instanceSettingsService(db).updateExperimental({ enableStatusCards: true });
+    }
   });
 
   it("rolls back a new card when compile wakeup fails", async () => {

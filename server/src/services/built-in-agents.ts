@@ -567,10 +567,10 @@ const DEFINITIONS = validateBuiltInAgentDefinitions([
 const DEFINITIONS_BY_KEY = new Map(DEFINITIONS.map((definition) => [definition.key, definition]));
 
 // Bundled built-in agents that should be provisioned automatically when a
-// company is created (and re-ensured on startup reconcile). Empty by default so
-// a new user starts clean — the Reflection Coach and Summarizer are opt-in, not
-// seeded. Add a definition key here to restore automatic provisioning.
-const AUTO_PROVISION_ON_COMPANY_CREATE_KEYS = new Set<string>([]);
+// company is created (and re-ensured on startup reconcile). The Summarizer is
+// seeded so new companies get status summaries without a settings dig; its
+// routine stays paused until an operator enables the schedule.
+const AUTO_PROVISION_ON_COMPANY_CREATE_KEYS = new Set<string>(["summarizer"]);
 
 const ROOT_AGENT_DEFAULT_CHANGE_GRANTS: PermissionKey[] = ["agents:configure", "skills:create"];
 const BUILT_IN_AGENT_DEFAULT_GRANTS: Record<string, PermissionKey[]> = {

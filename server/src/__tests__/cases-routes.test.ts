@@ -175,7 +175,9 @@ describeEmbeddedPostgres("cases routes", () => {
 
   it("gates every case route when enableCases is off", async () => {
     const company = await seedCompany("OFF");
-    const [caseRow] = await db.insert(cases).values({
+    await instanceSettingsService(db).updateExperimental({ enableCases: false });
+    try {
+      const [caseRow] = await db.insert(cases).values({
       companyId: company.id,
       caseNumber: 1,
       identifier: `${company.issuePrefix}-C1`,
@@ -193,6 +195,9 @@ describeEmbeddedPostgres("cases routes", () => {
     await http.post(`/api/cases/${caseRow!.id}/links`).send({ issueId: randomUUID(), role: "work" }).expect(403);
     await http.post(`/api/cases/${caseRow!.id}/attachments`).attach("file", Buffer.from("x"), "x.txt").expect(403);
     await http.get(`/api/cases/${caseRow!.id}/events`).expect(403);
+    } finally {
+      await instanceSettingsService(db).updateExperimental({ enableCases: true });
+    }
   });
 
   it("falls through shared /cases paths to later routers when the id is not a Cases row", async () => {

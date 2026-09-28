@@ -13,8 +13,10 @@ const manifest: PaperclipPluginManifestV1 = {
   categories: ["workspace", "ui"],
   capabilities: [
     "ui.detailTab.register",
+    "ui.dashboardWidget.register",
     "execution.workspaces.read",
     "project.workspaces.read",
+    "projects.read",
   ],
   entrypoints: {
     worker: "./dist/worker.js",
@@ -29,6 +31,13 @@ const manifest: PaperclipPluginManifestV1 = {
         exportName: "ChangesTab",
         entityTypes: ["execution_workspace", "project_workspace"],
         order: 25,
+      },
+      {
+        type: "dashboardWidget",
+        id: "workspace-changes-widget",
+        displayName: "Workspace Changes",
+        exportName: "WorkspaceChangesWidget",
+        order: 10,
       },
     ],
   },

@@ -97,6 +97,20 @@ const plugin = definePlugin({
         }),
       }, workspaceDiffQuerySchema.parse(params));
     });
+
+    ctx.data.register("workspace-changes-overview", async (params: Record<string, unknown>) => {
+      const companyId = readString(params.companyId);
+      if (!companyId) {
+        throw new Error("companyId is required");
+      }
+      const projects = await ctx.projects.list({ companyId, limit: 100 });
+      let workspaceCount = 0;
+      for (const project of projects) {
+        const workspaces = await ctx.projects.listWorkspaces(project.id, companyId);
+        workspaceCount += workspaces.length;
+      }
+      return { projectCount: projects.length, workspaceCount };
+    });
   },
 
   async onHealth() {

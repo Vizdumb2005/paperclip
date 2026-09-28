@@ -8,6 +8,7 @@ import {
   PluginSlotMount,
   _collectRegisterableExportNamesForTests,
   _resetPluginModuleLoader,
+  registerPluginReactComponent,
   registerPluginWebComponent,
   type ResolvedPluginSlot,
 } from "./slots";
@@ -83,5 +84,41 @@ describe("plugin slot export registration", () => {
 
     expect(container.textContent).not.toContain("Content Machine: Content");
     expect(container.querySelector("paperclip-test-sidebar")).not.toBeNull();
+  });
+
+  it("renders a dashboardWidget when its export is registered and nothing when it is gone", () => {
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+    const root = createRoot(container);
+    roots.push(root);
+    const slot: ResolvedPluginSlot = {
+      type: "dashboardWidget",
+      id: "workspace-changes-widget",
+      displayName: "Workspace Changes",
+      exportName: "WorkspaceChangesWidget",
+      pluginId: "paperclip.workspace-diff",
+      pluginKey: "paperclip.workspace-diff",
+      pluginDisplayName: "Workspace Changes",
+      pluginVersion: "0.1.0",
+    };
+
+    // Not installed: no export registered, hidden behavior renders nothing.
+    flushSync(() => {
+      root.render(createElement(PluginSlotMount, {
+        slot,
+        context: { companyId: "company-1" },
+      }));
+    });
+    expect(container.textContent).toBe("");
+
+    // Installed: the export registers and the widget renders.
+    flushSync(() => {
+      registerPluginReactComponent(
+        "paperclip.workspace-diff",
+        "WorkspaceChangesWidget",
+        () => createElement("p", null, "Workspace Changes"),
+      );
+    });
+    expect(container.textContent).toContain("Workspace Changes");
   });
 });

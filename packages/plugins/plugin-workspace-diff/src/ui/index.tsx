@@ -1,5 +1,5 @@
-import type { PluginDetailTabProps } from "@paperclipai/plugin-sdk/ui";
-import { copyTextToClipboard, usePluginData, usePluginToast } from "@paperclipai/plugin-sdk/ui";
+import type { PluginDetailTabProps, PluginWidgetProps } from "@paperclipai/plugin-sdk/ui";
+import { copyTextToClipboard, useHostNavigation, usePluginData, usePluginToast } from "@paperclipai/plugin-sdk/ui";
 import { DIFFS_TAG_NAME, getSingularPatch } from "@pierre/diffs";
 import type { PatchDiffProps } from "@pierre/diffs/react";
 import { useFileDiffInstance } from "@pierre/diffs/react";
@@ -822,6 +822,72 @@ export function ChangesTab({ context }: PluginDetailTabProps) {
           </main>
         </div>
       )}
+    </div>
+  );
+}
+
+interface WorkspaceChangesOverview {
+  projectCount: number;
+  workspaceCount: number;
+}
+
+export function WorkspaceChangesWidget({ context }: PluginWidgetProps) {
+  const navigation = useHostNavigation();
+  const companyId = context.companyId ?? "";
+  const params = useMemo(() => ({ companyId }), [companyId]);
+  const { data, loading, error, refresh } = usePluginData<WorkspaceChangesOverview>(
+    "workspace-changes-overview",
+    params,
+  );
+
+  if (!companyId) {
+    return (
+      <div className="space-y-1">
+        <p className="text-sm font-semibold">Workspace Changes</p>
+        <p className="text-xs text-muted-foreground">Select an organization to see Changes coverage.</p>
+      </div>
+    );
+  }
+
+  if (loading && !data) {
+    return (
+      <div className="space-y-1" aria-busy="true" aria-label="Loading workspace changes overview">
+        <p className="text-sm font-semibold">Workspace Changes</p>
+        <p className="text-xs text-muted-foreground">Loading coverage…</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-2">
+        <p className="text-sm font-semibold">Workspace Changes</p>
+        <p role="alert" className="text-xs text-destructive">
+          Couldn&apos;t load coverage{error.message ? `: ${error.message}` : "."}
+        </p>
+        <button type="button" className={buttonClass(false)} onClick={() => void refresh()}>
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      <p className="text-sm font-semibold">Workspace Changes</p>
+      <p className="text-xs text-muted-foreground">
+        {data?.projectCount ?? 0} project{(data?.projectCount ?? 0) === 1 ? "" : "s"} ·{" "}
+        {data?.workspaceCount ?? 0} workspace{(data?.workspaceCount ?? 0) === 1 ? "" : "s"} with
+        Changes tabs.
+      </p>
+      <div className="flex gap-2">
+        <button type="button" className={buttonClass(false)} onClick={() => void refresh()}>
+          Refresh
+        </button>
+        <a className={buttonClass(false)} {...navigation.linkProps("/projects")}>
+          Open projects
+        </a>
+      </div>
     </div>
   );
 }

@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
 import { afterEach, describe, expect, it } from "vitest";
-import { createTestHarness } from "@paperclipai/plugin-sdk/testing";
+import { createTestHarness, type TestHarness } from "@paperclipai/plugin-sdk/testing";
 import manifest from "../src/manifest.js";
 import plugin, { resolveDefaultBaseRef } from "../src/worker.js";
 
@@ -43,6 +43,16 @@ describe("workspace diff plugin", () => {
       type: "detailTab",
       displayName: "Changes",
       entityTypes: ["execution_workspace", "project_workspace"],
+    }));
+  });
+
+  it("declares a dashboard widget slot backed by the overview data action", () => {
+    expect(manifest.capabilities).toContain("ui.dashboardWidget.register");
+    expect(manifest.capabilities).toContain("projects.read");
+    expect(manifest.ui?.slots).toContainEqual(expect.objectContaining({
+      type: "dashboardWidget",
+      displayName: "Workspace Changes",
+      exportName: "WorkspaceChangesWidget",
     }));
   });
 
@@ -343,5 +353,67 @@ describe("workspace diff plugin", () => {
     await expect(harness.getData("workspace-diff", {
       workspaceId: "workspace-1",
     })).rejects.toThrow("workspaceId and companyId are required");
+  });
+
+  it("summarizes Changes coverage across company projects for the dashboard widget", async () => {
+    const harness = createTestHarness({ manifest });
+    harness.seed({
+      projects: [
+        { id: "project-1", companyId: "company-1" },
+        { id: "project-2", companyId: "company-1" },
+        { id: "project-3", companyId: "company-2" },
+      ] as unknown as Parameters<TestHarness["seed"]>[0]["projects"],
+      projectWorkspaces: [
+        {
+          id: "workspace-1",
+          projectId: "project-1",
+          name: "Primary",
+          path: "/tmp/ws-1",
+          repoUrl: null,
+          repoRef: "main",
+          defaultRef: "main",
+          isPrimary: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          id: "workspace-2",
+          projectId: "project-1",
+          name: "Secondary",
+          path: "/tmp/ws-2",
+          repoUrl: null,
+          repoRef: "main",
+          defaultRef: "main",
+          isPrimary: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          id: "workspace-3",
+          projectId: "project-3",
+          name: "Other",
+          path: "/tmp/ws-3",
+          repoUrl: null,
+          repoRef: "main",
+          defaultRef: "main",
+          isPrimary: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      ],
+    });
+    await plugin.definition.setup(harness.ctx);
+
+    await expect(harness.getData("workspace-changes-overview", {
+      companyId: "company-1",
+    })).resolves.toEqual({ projectCount: 2, workspaceCount: 2 });
+  });
+
+  it("requires companyId for the dashboard widget overview", async () => {
+    const harness = createTestHarness({ manifest });
+    await plugin.definition.setup(harness.ctx);
+
+    await expect(harness.getData("workspace-changes-overview", {}))
+      .rejects.toThrow("companyId is required");
   });
 });

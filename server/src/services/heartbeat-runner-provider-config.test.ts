@@ -7,6 +7,21 @@ import {
 } from "./native-runtime/provider-profile.js";
 
 describe("Paperclip Runner native provider configuration", () => {
+  it.each([undefined, "approve-all", "approve-paperclip", "approve-reads", "deny-all"])(
+    "passes Grok's full-auto default or explicit %s policy to the native runner",
+    (acpxPermissionMode) => {
+      expect(resolvePaperclipRunnerNativeProviderInput({
+        backend: "acpx_runtime",
+        adapterConfig: { provider: "acpx", acpxAgent: "grok", acpxPermissionMode },
+      })).toEqual({
+        provider: "acpx",
+        acpxAgent: "grok",
+        model: "grok-4.7",
+        acpxPermissionMode: acpxPermissionMode ?? "approve-all",
+      });
+    },
+  );
+
   it("qualifies native Codex only in never-ask mode", () => {
     expect(
       resolvePaperclipRunnerNativeProviderInput({
@@ -376,6 +391,6 @@ describe("Paperclip Runner native provider configuration", () => {
         backend: "acpx_runtime",
         adapterConfig: { provider: "acpx", acpxAgent: "pi", model: "pi-model" },
       }),
-    ).toThrow("Pi is not available");
+    ).toThrow("Pi is awaiting local and Daytona qualification");
   });
 });

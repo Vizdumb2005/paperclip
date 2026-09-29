@@ -40,7 +40,7 @@
     {
       "path": "schemas/event-v2.schema.json",
       "id": "https://paperclip.dev/schemas/prp/v2/event.schema.json",
-      "sha256": "70dcf9215a03045ebd0df1272f93625e5201e0d26d6a87dd6bbd6db2a0c281b1"
+      "sha256": "a1d400bf44613e4beb4a1363adbbb0f4fb0f890ea5d889fe94ae08a699b9abc8"
     },
     {
       "path": "schemas/event.schema.json",
@@ -65,12 +65,12 @@
     {
       "path": "schemas/provider-descriptor.schema.json",
       "id": "https://paperclip.dev/schemas/prp/v1/provider-descriptor.schema.json",
-      "sha256": "edea292fa4c4464d6fd91776c2edf98ba471f1c847e51e48e374f15ae838dca6"
+      "sha256": "23e38dbaaa9104b29658d02cc80e46d4ae6d64fee6c0a6d569d084cb3eb50ba5"
     },
     {
       "path": "schemas/provider-event.schema.json",
       "id": "https://paperclip.dev/schemas/prp/v1/provider-event.schema.json",
-      "sha256": "28ad4e91b78271827ec86bc316c930eee70f8d50c5bbefa55b09fe792e34e759"
+      "sha256": "07bd97a101ec4e4decaf4ccacabdf4badc40f7a1284adfd3ef0c1e57c70c6421"
     },
     {
       "path": "schemas/question-adapter-fixture.schema.json",
@@ -85,12 +85,12 @@
     {
       "path": "schemas/question-set.schema.json",
       "id": "https://paperclip.dev/schemas/prp/v1/question-set.schema.json",
-      "sha256": "afa7cb7384fac3f36f90cb8fd59ef4f8ac6b2b5b5c028ca943c5765184a33d51"
+      "sha256": "022f01fa3634b627361da90512ac4cca68445759b25ebe6284740b2fc669c4fa"
     },
     {
       "path": "schemas/request.schema.json",
       "id": "https://paperclip.dev/schemas/prp/v1/request.schema.json",
-      "sha256": "07bb6261efe305c7109b4a83921607d69fb21e2f61f52258d3922eeb1b92988e"
+      "sha256": "7588764837a4ebadc5c63a2f864b2643cad0bcdf8b474bc86b742a1fd7dac34c"
     },
     {
       "path": "schemas/result.schema.json",
@@ -160,7 +160,7 @@
     },
     {
       "path": "fixtures/evals/native-execution-seeded.json",
-      "sha256": "5901d8d4799e83631bd34da8387d24470c7590d4a4fe629c1d0a304d90213cb9",
+      "sha256": "151dcbaa87e075590b1a4d68f86f705a4eee208370e26d039420e7ccf09ce2b9",
       "expectation": "accept",
       "compatibilityCase": "canonical"
     },

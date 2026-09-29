@@ -1081,3 +1081,7 @@ export * from "./organizational-learning.js";
 export * from "./self-organization.js";
 export * from "./ceo-chat.js";
 export * from "./ticket-on-ramps.js";
+
+export type { AgentInstructionErrorCode, AgentInstructionErrorDetails, AgentInstructionSource, AgentInstructionRevision, AgentInstructionSnapshot, AgentInstructionCommitReceipt, AgentInstructionHistory, AgentInstructionDiff } from "./agent.js";
+
+export type { AgentInstructionCandidate } from "./agent.js";

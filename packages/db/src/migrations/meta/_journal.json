@@ -1986,15 +1986,36 @@
     {
       "idx": 285,
       "version": "7",
-      "when": 1790505796307,
-      "tag": "0285_certain_tempest",
+      "when": 1790603883247,
+      "tag": "0285_heavy_oracle",
       "breakpoints": true
     },
     {
       "idx": 286,
       "version": "7",
-      "when": 1790625234346,
-      "tag": "0286_known_jasper_sitwell",
+      "when": 1790607525758,
+      "tag": "0286_complete_alice",
+      "breakpoints": true
+    },
+    {
+      "idx": 287,
+      "version": "7",
+      "when": 1790611116286,
+      "tag": "0287_serious_tinkerer",
+      "breakpoints": true
+    },
+    {
+      "idx": 288,
+      "version": "7",
+      "when": 1790698275677,
+      "tag": "0288_dry_kylun",
+      "breakpoints": true
+    },
+    {
+      "idx": 289,
+      "version": "7",
+      "when": 1790698388874,
+      "tag": "0289_fast_madelyne_pryor",
       "breakpoints": true
     }
   ]

@@ -12,25 +12,16 @@ const stagingDir = process.argv[2] ?? path.join(desktopRoot, "build", "server");
 function copyEntry(from, to) {
   const stat = fs.lstatSync(from);
   if (stat.isSymbolicLink()) {
-    // Preserve pnpm's junctions as junctions (no privilege needed to
-    // recreate, unlike symlinks). File links are rare in pnpm layouts;
-    // materialize those as plain copies.
+    // Preserve pnpm's junctions as junctions (recreating them needs no
+    // privilege, unlike symlinks). Absolute targets are rebased to the
+    // install location at app startup (see rebaseStagedLinks); the recorded
+    // staging root marker makes that possible.
     const target = fs.readlinkSync(from);
-    let isDir = false;
-    try {
-      isDir = fs.statSync(path.resolve(path.dirname(from), target)).isDirectory();
-    } catch {}
     fs.mkdirSync(path.dirname(to), { recursive: true });
     try {
       fs.unlinkSync(to);
     } catch {}
-    if (isDir && process.platform === "win32") {
-      fs.symlinkSync(target, to, "junction");
-    } else if (isDir) {
-      fs.symlinkSync(target, to, "dir");
-    } else {
-      fs.copyFileSync(fs.realpathSync(from), to);
-    }
+    fs.symlinkSync(target, to, "junction");
     return;
   }
   if (stat.isDirectory()) {
@@ -94,6 +85,10 @@ copyDir(uiDist, path.join(stagingDir, "ui-dist"));
 
 console.log("[stage-server] applying publishConfig exports");
 applyPublishConfigs(path.join(stagingDir, "node_modules"));
+
+// Record the staging root so the packaged app can rebase the absolute
+// junctions pnpm deploy writes (see rebaseStagedLinks in server-manager).
+fs.writeFileSync(path.join(stagingDir, ".stage-root"), `${stagingDir}\n`, "utf8");
 
 const loader = path.join(stagingDir, "node_modules", "tsx", "dist", "loader.mjs");
 if (!fs.existsSync(loader)) {

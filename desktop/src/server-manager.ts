@@ -51,6 +51,65 @@ function findRepoRoot(startDir: string): string | null {
   return null;
 }
 
+/**
+ * Rebase the absolute junctions pnpm deploy writes to the bundle's actual
+ * install location. Junctions are recreated without privilege (unlike
+ * symlinks), and the recorded staging root tells us which prefix to swap.
+ * Runs only for the packaged fallback; dev checkouts keep their live tree.
+ */
+export function rebaseStagedLinks(serverRoot: string): void {
+  let recordedRoot: string | null = null;
+  try {
+    recordedRoot = fs.readFileSync(path.join(serverRoot, ".stage-root"), "utf8").trim() || null;
+  } catch {
+    return;
+  }
+  if (!recordedRoot || path.resolve(recordedRoot) === path.resolve(serverRoot)) return;
+  const prefix = recordedRoot.endsWith(path.sep) ? recordedRoot : `${recordedRoot}${path.sep}`;
+  let fixed = 0;
+  const visit = (dir: string): void => {
+    let entries: string[];
+    try {
+      entries = fs.readdirSync(dir);
+    } catch {
+      return;
+    }
+    for (const entry of entries) {
+      const full = path.join(dir, entry);
+      let stat;
+      try {
+        stat = fs.lstatSync(full);
+      } catch {
+        continue;
+      }
+      if (stat.isSymbolicLink()) {
+        let target: string;
+        try {
+          target = fs.readlinkSync(full);
+        } catch {
+          continue;
+        }
+        if (target.startsWith(prefix)) {
+          const next = path.join(serverRoot, target.slice(prefix.length));
+          try {
+            fs.unlinkSync(full);
+            fs.symlinkSync(next, full, "junction");
+            fixed++;
+          } catch {
+            // Leave the stale link; the boot error will name the server log.
+          }
+        }
+        continue;
+      }
+      if (stat.isDirectory()) visit(full);
+    }
+  };
+  visit(path.join(serverRoot, "node_modules"));
+  if (fixed > 0) {
+    console.log(`[paperclip] rebased ${fixed} staged links to ${serverRoot}`);
+  }
+}
+
 export class ServerManager {
   private port: number = 3100;
   private childProc: ChildProcess | null = null;
@@ -140,6 +199,7 @@ export class ServerManager {
       ];
       spawnCwd = serverRoot;
       runAsNode = true;
+      rebaseStagedLinks(serverRoot);
     }
 
     const env: Record<string, string | undefined> = {

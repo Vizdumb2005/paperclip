@@ -27,3 +27,4 @@ export { companyMemoryApi } from "./companyMemory";
 export { ceoChatApi } from "./ceoChat";
 export { selfOrganizationApi } from "./selfOrganization";
 export { ticketOnRampsApi } from "./ticketOnRamps";
+export { cloudRelayApi } from "./cloudRelay";

@@ -3,6 +3,7 @@ import type { Db } from "@paperclipai/db";
 import { agents, approvals, routines, workQueues } from "@paperclipai/db";
 import type { OrganizationalProposal } from "@paperclipai/shared";
 import { logActivity } from "./activity-log.js";
+import { assessApprovalRiskWithLaya } from "./laya-risk-scorer.js";
 
 export function selfOrganizationService(db: Db) {
   return {
@@ -11,6 +12,11 @@ export function selfOrganizationService(db: Db) {
       agentId: string,
       proposal: OrganizationalProposal,
     ) {
+      const riskAssessment = await assessApprovalRiskWithLaya(
+        "organizational_proposal",
+        proposal as unknown as Record<string, unknown>,
+      );
+
       const [approval] = await db
         .insert(approvals)
         .values({
@@ -25,6 +31,7 @@ export function selfOrganizationService(db: Db) {
             targetAgentId: proposal.targetAgentId ?? null,
             proposedChanges: proposal.proposedChanges,
             proposedAt: new Date().toISOString(),
+            riskAssessment,
           },
         })
         .returning();

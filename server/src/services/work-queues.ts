@@ -8,6 +8,7 @@ import type {
   WorkQueueRoutingPolicy,
 } from "@paperclipai/shared";
 import { issueService } from "./issues.js";
+import { defaultLayaEngine, type LayaQuestion } from "./laya-engine.js";
 
 /**
  * Sliding-window rate limiter inspired by Vigil Stream's RingBuffer.
@@ -92,6 +93,71 @@ export function classifyWithLaya(payload: Record<string, unknown>): LayaClassifi
     requiresHumanEscalation,
     probabilities: {
       isCritical: hasCritical ? 0.95 : 0.05,
+      isBug: category === "bug_fix" ? 0.9 : 0.1,
+      isActionable: requiresHumanEscalation ? 0.3 : 0.9,
+    },
+  };
+}
+
+/**
+ * Async Laya Decision Engine classifier.
+ * Leverages the full Laya non-autoregressive decision model.
+ */
+export async function classifyWithLayaEngine(
+  payload: Record<string, unknown>,
+): Promise<LayaClassification> {
+  const questions: LayaQuestion[] = [
+    {
+      id: "domain",
+      type: "choice",
+      question: "Which engineering or organizational domain does this work item belong to?",
+      options: ["frontend", "backend", "devops", "product", "general"] as const,
+    },
+    {
+      id: "severity",
+      type: "choice",
+      question: "What is the severity of this issue?",
+      options: ["critical", "high", "standard", "low"] as const,
+    },
+    {
+      id: "category",
+      type: "choice",
+      question: "What is the primary category of work?",
+      options: ["bug_fix", "feature_request", "code_review", "general_inquiry"] as const,
+    },
+    {
+      id: "requires_escalation",
+      type: "boolean",
+      question: "Does this require human managerial escalation?",
+    },
+  ];
+
+  const decision = await defaultLayaEngine.decide(payload, questions);
+
+  const domain = (decision.answers["domain"]?.type === "choice"
+    ? decision.answers["domain"].answer
+    : "general") as LayaClassification["domain"];
+
+  const severity = (decision.answers["severity"]?.type === "choice"
+    ? decision.answers["severity"].answer
+    : "standard") as LayaClassification["severity"];
+
+  const category = decision.answers["category"]?.type === "choice"
+    ? decision.answers["category"].answer
+    : "general_inquiry";
+
+  const requiresHumanEscalation = decision.answers["requires_escalation"]?.type === "boolean"
+    ? decision.answers["requires_escalation"].answer
+    : severity === "critical";
+
+  return {
+    category,
+    severity,
+    domain,
+    confidence: decision.answers["domain"]?.type === "choice" ? decision.answers["domain"].probability : 0.9,
+    requiresHumanEscalation,
+    probabilities: {
+      isCritical: severity === "critical" ? 0.95 : 0.05,
       isBug: category === "bug_fix" ? 0.9 : 0.1,
       isActionable: requiresHumanEscalation ? 0.3 : 0.9,
     },

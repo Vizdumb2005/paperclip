@@ -48,6 +48,7 @@ if (!gotTheLock) {
       isPackaged: app.isPackaged,
       preferredPort: 3100,
       logFile: path.join(app.getPath("userData"), "logs", "server.log"),
+      bundledServerPath: path.join(process.resourcesPath, "server", "dist", "index.js"),
       onStatus: (status) => {
         sendSplashStatus(status);
       },

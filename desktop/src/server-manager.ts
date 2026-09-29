@@ -16,7 +16,18 @@ export interface ServerManagerOptions {
    * has no visible console, so without this a startup failure is
    * undiagnosable. Main passes app.getPath("userData")/logs/server.log.
    */
+  /**
+   * File the spawned server's stdout/stderr is appended to. The packaged app
+   * has no visible console, so without this a startup failure is
+   * undiagnosable. Main passes app.getPath("userData")/logs/server.log.
+   */
   logFile?: string;
+  /**
+   * Absolute path to the packaged server entry
+   * (<resources>/server/dist/index.js). Used only when no repo checkout is
+   * found; dev checkouts keep booting from source.
+   */
+  bundledServerPath?: string;
 }
 
 // Cold boots through tsx (transform + embedded Postgres init + migrations)
@@ -89,6 +100,9 @@ export class ServerManager {
     let execCmd = "node";
     let execArgs: string[] = [];
     let spawnCwd = this.options.appRoot;
+    // Set for the packaged fallback (Electron's own node); dev branches leave
+    // the ambient environment untouched.
+    let runAsNode = false;
 
     if (repoRoot) {
       spawnCwd = path.join(repoRoot, "server");
@@ -104,25 +118,40 @@ export class ServerManager {
         spawnCwd = repoRoot;
       }
     } else {
-      // Packaged fallback
-      const bundledServer = path.join(this.options.appRoot, "server/dist/index.js");
+      // Packaged fallback: server bundle shipped under Electron resources
+      // (extraResources "server"). It runs on Electron's own node via
+      // ELECTRON_RUN_AS_NODE so no system node is required, with the same
+      // tsx loader production Docker uses.
+      const serverRoot = this.options.bundledServerPath
+        ? path.dirname(path.dirname(this.options.bundledServerPath))
+        : path.join(this.options.appRoot, "server");
+      const bundledServer = path.join(serverRoot, "dist", "index.js");
       if (!fs.existsSync(bundledServer)) {
         throw new Error(
           `Packaged server bundle not found at ${bundledServer}. ` +
-            `The desktop installer does not ship a server build yet — launch from a Paperclip repo checkout instead.`,
+            `Reinstall Paperclip — launch from a Paperclip repo checkout instead.`,
         );
       }
-      execCmd = "node";
-      execArgs = [bundledServer];
+      execCmd = process.execPath;
+      execArgs = [
+        "--import",
+        path.join(serverRoot, "node_modules", "tsx", "dist", "loader.mjs"),
+        bundledServer,
+      ];
+      spawnCwd = serverRoot;
+      runAsNode = true;
     }
 
-    const env = {
+    const env: Record<string, string | undefined> = {
       ...process.env,
       PORT: String(this.port),
       NODE_ENV: "development",
       PAPERCLIP_MIGRATION_AUTO_APPLY: "true",
       PAPERCLIP_MIGRATION_PROMPT: "never",
     };
+    if (runAsNode) {
+      env.ELECTRON_RUN_AS_NODE = "1";
+    }
 
     try {
       this.childProc = spawn(execCmd, execArgs, {

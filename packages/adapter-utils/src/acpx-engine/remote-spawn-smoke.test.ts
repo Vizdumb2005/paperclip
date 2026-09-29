@@ -36,6 +36,7 @@ const tempRoots: string[] = [];
 
 type PatchedAcpRuntimeOptions = AcpRuntimeOptions & {
   onAgentSpawn?: (meta: { pid: number; startedAt: string }) => Promise<void>;
+  onAgentStderr?: (chunk: string) => void;
   spawnCwd?: string;
 };
 

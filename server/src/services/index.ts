@@ -235,3 +235,6 @@ export { organizationalLearningService } from "./organizational-learning.js";
 export { selfOrganizationService } from "./self-organization.js";
 export { ceoChatService, parseCeoWorkActions } from "./ceo-chat.js";
 export { ticketOnRampService } from "./ticket-on-ramps.js";
+export { LayaDecisionEngine, defaultLayaEngine } from "./laya-engine.js";
+export { assessApprovalRiskWithLaya } from "./laya-risk-scorer.js";
+

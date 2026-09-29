@@ -71,6 +71,9 @@ interface GoalAwareAcpRuntime extends AcpRuntime {
 type GoalAwareAcpRuntimeOptions = AcpRuntimeOptions & {
   onAgentInitialize?: (result: unknown) => void;
   onSessionNotification?: (notification: unknown) => void;
+  spawnEnvironment?: () => Record<string, string>;
+  spawnCwd?: string;
+  spawnAgent?: (input: any) => ChildProcess;
 };
 
 interface AcpxRuntimeGoalState {

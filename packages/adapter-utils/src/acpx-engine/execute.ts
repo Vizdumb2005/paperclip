@@ -188,6 +188,9 @@ function flushChildStderr(state: ChildStderrState) {
 
 type PaperclipAcpRuntimeOptions = AcpRuntimeOptions & {
   onAgentSpawn?: (meta: AcpxAgentProcessIdentity) => Promise<void>;
+  onAgentStderr?: (chunk: any) => void;
+  spawnCwd?: string;
+  inheritProcessEnv?: boolean;
   // Return the current-run parent-context token. It is the `task.run` token
   // during startup and after the turn, and the `agent.turn` token during the
   // turn. A detached exec reads this getter to parent to the live run span. The

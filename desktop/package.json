@@ -10,6 +10,7 @@
     "build": "pnpm run build:main",
     "typecheck": "tsc --noEmit",
     "start": "electron .",
+    "stage:server": "node scripts/stage-server.mjs",
     "pack:dir": "pnpm run build && electron-builder --dir",
     "dist:win": "pnpm run build && electron-builder --win --x64"
   },
@@ -36,6 +37,12 @@
       "dist/**/*",
       "assets/**/*",
       "splash.html"
+    ],
+    "extraResources": [
+      {
+        "from": "build/server",
+        "to": "server"
+      }
     ]
   },
   "dependencies": {

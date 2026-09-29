@@ -1963,6 +1963,7 @@ export {
   issueExecutionPolicySchema,
   issueExecutionStateSchema,
   resolveIssueRecoveryActionSchema,
+  retryWorkspaceExportSchema,
   issueReviewRequestSchema,
   issueExecutionWorkspaceSettingsSchema,
   checkoutIssueSchema,
@@ -2788,6 +2789,7 @@ export * from "./slack-tools.js";
 export { MEMORY_CONNECTOR_IDS, isMemoryConnectorId, type MemoryConnectorId } from "./memory-connectors.js";
 export * from "./connection-routing.js";
 
+<<<<<<< HEAD
 export { WORKSPACE_RESTORE_FAILURE_CODES, hasWorkspaceRestoreFailure, safeWorkspaceRestorePath } from "./workspace-restore.js";
 export * from "./types/company-memory.js";
 export * from "./types/work-queues.js";
@@ -2796,3 +2798,6 @@ export * from "./types/organizational-learning.js";
 export * from "./types/self-organization.js";
 export * from "./types/ceo-chat.js";
 export * from "./types/ticket-on-ramps.js";
+=======
+export { WORKSPACE_RESTORE_FAILURE_CODES, hasWorkspaceRestoreFailure, safeWorkspaceRestorePath, isNativeWorkspaceExportRepairCause } from "./workspace-restore.js";
+>>>>>>> upstream/master

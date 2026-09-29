@@ -47,6 +47,7 @@ if (!gotTheLock) {
       appRoot,
       isPackaged: app.isPackaged,
       preferredPort: 3100,
+      logFile: path.join(app.getPath("userData"), "logs", "server.log"),
       onStatus: (status) => {
         sendSplashStatus(status);
       },

@@ -11,7 +11,18 @@ export interface ServerManagerOptions {
   isPackaged: boolean;
   onStatus?: (status: string) => void;
   onLog?: (log: string) => void;
+  /**
+   * File the spawned server's stdout/stderr is appended to. The packaged app
+   * has no visible console, so without this a startup failure is
+   * undiagnosable. Main passes app.getPath("userData")/logs/server.log.
+   */
+  logFile?: string;
 }
+
+// Cold boots through tsx (transform + embedded Postgres init + migrations)
+// measured ~40s warm on dev hardware; first boots run longer. The old 60s cap
+// turned slow-but-healthy startups into a scary error dialog.
+const STARTUP_TIMEOUT_SECONDS = 240;
 
 function findRepoRoot(startDir: string): string | null {
   let curr = startDir;
@@ -62,7 +73,7 @@ export class ServerManager {
     // Paperclip server (e.g. another `pnpm dev` still booting, or an unrelated
     // process), spawning a second server only makes it worse: the server
     // auto-selects the next free port while this manager keeps polling the
-    // preferred one until the 60s timeout. Fail fast with an actionable error.
+    // preferred one until the startup timeout. Fail fast with an actionable error.
     if (await this.isPortOccupied(this.port)) {
       throw new Error(
         `Port ${this.port} is already in use by another process that is not a healthy Paperclip server. ` +
@@ -124,6 +135,7 @@ export class ServerManager {
 
       this.childProc.stdout?.on("data", (data: Buffer) => {
         const text = data.toString();
+        this.appendServerLog(`[server] ${text}`);
         this.options.onLog?.(`[server] ${text}`);
         const clean = text
           .replace(/\u001b\[[0-9;]*m/g, "")
@@ -141,6 +153,7 @@ export class ServerManager {
       this.childProc.stderr?.on("data", (data: Buffer) => {
         const text = data.toString();
         this.lastStderr = text;
+        this.appendServerLog(`[server:err] ${text}`);
         this.options.onLog?.(`[server:err] ${text}`);
       });
 
@@ -157,7 +170,7 @@ export class ServerManager {
       });
 
       // Wait for health check to pass
-      await this.waitForHealthy(60, 1000);
+      await this.waitForHealthy(STARTUP_TIMEOUT_SECONDS, 1000);
       this.isRunning = true;
       this.options.onStatus?.("Paperclip control plane ready!");
       return this.port;
@@ -200,6 +213,17 @@ export class ServerManager {
     });
   }
 
+  private appendServerLog(text: string): void {
+    const logFile = this.options.logFile;
+    if (!logFile) return;
+    try {
+      fs.mkdirSync(path.dirname(logFile), { recursive: true });
+      fs.appendFileSync(logFile, text);
+    } catch {
+      // Logging must never break startup.
+    }
+  }
+
   private async waitForHealthy(maxAttempts: number, intervalMs: number): Promise<void> {
     for (let i = 0; i < maxAttempts; i++) {
       if (this.childSpawnError) {
@@ -222,7 +246,8 @@ export class ServerManager {
 
     throw new Error(
       `Server failed to report healthy on port ${this.port} after ${maxAttempts} seconds` +
-        (this.lastStderr ? `. Server output: ${this.lastStderr.trim().slice(-500)}` : ". Check that no other process is using the port."),
+        (this.lastStderr ? `. Server output: ${this.lastStderr.trim().slice(-500)}` : ". Check that no other process is using the port.") +
+        (this.options.logFile ? ` Full server log: ${this.options.logFile}` : ""),
     );
   }
 

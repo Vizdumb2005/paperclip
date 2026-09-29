@@ -8587,14 +8587,11 @@ export function buildPaperclipTaskMarkdown(input: {
   // false builds the compact variant used for resume deltas, where the session
   // already received the description with the assignment.
   includeDescription?: boolean;
-<<<<<<< HEAD
   companyMemoryContext?: string | null;
   isMaximizerMode?: boolean;
-=======
   // Current wake events are rendered by the structured wake prompt on
   // adapter lanes. Keep the legacy default for standalone callers.
   includeWakeComments?: boolean;
->>>>>>> upstream/master
 }) {
   const quoteTaskScalar = (value: string) => JSON.stringify(value);
   const fenceTaskText = (value: string) => {
@@ -20924,7 +20921,6 @@ export function heartbeatService(
             exposeLowTrustRaw,
           })
         : null;
-<<<<<<< HEAD
       const isMaximizerMode = issueRef?.workMode === "maximizer";
       const companyMemoryContext = issueRef && !isConversation(issueContext)
         ? await companyMemoryService(db).hydrateAgentContext(agent.companyId, {
@@ -20938,13 +20934,12 @@ export function heartbeatService(
         taskPlan,
         companyMemoryContext,
         isMaximizerMode,
-=======
-      let taskMarkdown = buildPaperclipTaskMarkdown({ ...taskMarkdownInput, taskPlan });
+      });
       let taskMarkdownAssignment = buildPaperclipTaskMarkdown({
         ...taskMarkdownInput,
         taskPlan,
         includeWakeComments: false,
->>>>>>> upstream/master
+      });
       });
       if (isConversation(issueContext) && !taskSession && issueId) {
         const replay = await conversationReplay(db, agent.companyId, issueId, wakeCommentId);

@@ -5,11 +5,11 @@ import { INSTANCE_FEATURE_CATALOG } from "./feature-catalog.js";
 import { instanceExperimentalSettingsSchema, patchInstanceExperimentalSettingsSchema } from "./validators/instance.js";
 
 describe("experimental memory connectors", () => {
-  it("defaults off and preserves patch semantics", () => {
-    expect(instanceExperimentalSettingsSchema.parse({}).enableMemoryConnectors).toBe(false);
+  it("defaults on and preserves patch semantics", () => {
+    expect(instanceExperimentalSettingsSchema.parse({}).enableMemoryConnectors).toBe(true);
     expect(patchInstanceExperimentalSettingsSchema.parse({})).not.toHaveProperty("enableMemoryConnectors");
     expect(patchInstanceExperimentalSettingsSchema.parse({ enableMemoryConnectors: true })).toEqual({ enableMemoryConnectors: true });
-    expect(INSTANCE_FEATURE_CATALOG.enableMemoryConnectors).toMatchObject({ tier: "managed", selfHostedDefault: false, cloudDefault: false });
+    expect(INSTANCE_FEATURE_CATALOG.enableMemoryConnectors).toMatchObject({ tier: "managed", selfHostedDefault: true, cloudDefault: false });
     expect(isMemoryConnectorId("notion")).toBe(false);
   });
   it.each(MEMORY_CONNECTOR_IDS)("has a supported, branded %s setup method", (slug) => {

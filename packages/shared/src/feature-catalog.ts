@@ -48,7 +48,7 @@ export const INSTANCE_FEATURE_CATALOG: Record<InstanceFeatureKey, FeatureCatalog
       "Show environment management in company settings and allow project and agent environment assignment controls.",
     tier: "managed",
     cloudDefault: false,
-    selfHostedDefault: false,
+    selfHostedDefault: true,
   },
   enableNativeRunner: {
     title: "Paperclip Runner",
@@ -75,7 +75,7 @@ export const INSTANCE_FEATURE_CATALOG: Record<InstanceFeatureKey, FeatureCatalog
       "Show execution workspace controls in project configuration and allow isolated workspace behavior for task runs.",
     tier: "managed",
     cloudDefault: false,
-    selfHostedDefault: false,
+    selfHostedDefault: true,
   },
   enableIsolatedWorkspacesByDefault: {
     title: "Isolated Workspaces By Default",
@@ -83,7 +83,7 @@ export const INSTANCE_FEATURE_CATALOG: Record<InstanceFeatureKey, FeatureCatalog
       "Treat a project that has no execution workspace policy of its own as if it selected isolated workspaces, so its tasks get a per-task worktree instead of sharing the project checkout. Requires Isolated Workspaces. A project that carries its own policy keeps it.",
     tier: "managed",
     cloudDefault: false,
-    selfHostedDefault: false,
+    selfHostedDefault: true,
   },
   enableStreamlinedLeftNavigation: {
     title: "Streamlined Left Navigation",
@@ -114,14 +114,14 @@ export const INSTANCE_FEATURE_CATALOG: Record<InstanceFeatureKey, FeatureCatalog
       "Show experimental chat connector setup and Board surfaces. Existing connections keep running when hidden; GitHub and other tool connectors are unaffected.",
     tier: "managed",
     cloudDefault: false,
-    selfHostedDefault: false,
+    selfHostedDefault: true,
   },
   enableMemoryConnectors: {
     title: "Memory connectors",
     description: "Show experimental Mem0, Zep, Supermemory, Cognee, and Honcho setup. Existing connections keep running when hidden.",
     tier: "managed",
     cloudDefault: false,
-    selfHostedDefault: false,
+    selfHostedDefault: true,
   },
   enableMcpAggregators: {
     title: "MCP aggregators (compatibility)",
@@ -135,7 +135,7 @@ export const INSTANCE_FEATURE_CATALOG: Record<InstanceFeatureKey, FeatureCatalog
     description: "Enable pipeline definitions and pipeline-driven case production surfaces.",
     tier: "managed",
     cloudDefault: false,
-    selfHostedDefault: false,
+    selfHostedDefault: true,
   },
   enableCases: {
     title: "Cases",
@@ -150,7 +150,7 @@ export const INSTANCE_FEATURE_CATALOG: Record<InstanceFeatureKey, FeatureCatalog
     description: "Persistent task-backed conversations that clarify goals and hand work off to tasks.",
     tier: "managed",
     cloudDefault: false,
-    selfHostedDefault: false,
+    selfHostedDefault: true,
   },
   enableConferenceRoomChat: {
     title: "Conference Room Chat",
@@ -158,7 +158,7 @@ export const INSTANCE_FEATURE_CATALOG: Record<InstanceFeatureKey, FeatureCatalog
       "Add the Conference Room team chat, the live activity feed, and the redesigned onboarding; restyles task threads as chat bubbles.",
     tier: "managed",
     cloudDefault: false,
-    selfHostedDefault: false,
+    selfHostedDefault: true,
   },
   enableClassicTaskInterface: {
     title: "Classic Task Interface",
@@ -166,14 +166,14 @@ export const INSTANCE_FEATURE_CATALOG: Record<InstanceFeatureKey, FeatureCatalog
       "Restore the pre-chat task detail page: the page-level header with inline description editor, the plain comment thread, and the fixed Properties sidebar. Chat-only features (streaming activity folding, inline plan/question cards, the three-mode composer) are unavailable in the classic view.",
     tier: "preference",
     cloudDefault: false,
-    selfHostedDefault: false,
+    selfHostedDefault: true,
   },
   enableIssuePlanDecompositions: {
     title: "Task Plan Decomposition",
     description: "Show accepted-plan decomposition history on task detail pages.",
     tier: "managed",
     cloudDefault: false,
-    selfHostedDefault: false,
+    selfHostedDefault: true,
   },
   enableExperimentalFileViewer: {
     title: "Experimental File Viewer",
@@ -181,7 +181,7 @@ export const INSTANCE_FEATURE_CATALOG: Record<InstanceFeatureKey, FeatureCatalog
       "Show task detail controls for browsing and previewing workspace files relative to a task.",
     tier: "preference",
     cloudDefault: false,
-    selfHostedDefault: false,
+    selfHostedDefault: true,
   },
   enableStatusCards: {
     title: "Status Cards",
@@ -197,7 +197,7 @@ export const INSTANCE_FEATURE_CATALOG: Record<InstanceFeatureKey, FeatureCatalog
       "Detect external URLs in issues and show resolved status for pull requests, tickets, and other referenced work objects.",
     tier: "managed",
     cloudDefault: false,
-    selfHostedDefault: false,
+    selfHostedDefault: true,
   },
   enableSmokeLab: {
     title: "Smoke Lab",
@@ -205,7 +205,7 @@ export const INSTANCE_FEATURE_CATALOG: Record<InstanceFeatureKey, FeatureCatalog
       "Add the Smoke Lab tab and dashboard card for exercising integration paths against deterministic local fixtures. Private deployments only.",
     tier: "managed",
     cloudDefault: false,
-    selfHostedDefault: false,
+    selfHostedDefault: true,
   },
   enableBuiltInAgents: {
     title: "Built-in Agents",
@@ -213,14 +213,14 @@ export const INSTANCE_FEATURE_CATALOG: Record<InstanceFeatureKey, FeatureCatalog
       "Show Paperclip-managed built-in agent surfaces, including roster badges, the Built-in agents tab, and setup controls.",
     tier: "managed",
     cloudDefault: false,
-    selfHostedDefault: false,
+    selfHostedDefault: true,
   },
   enableBetaSkills: {
     title: "Beta skills",
     description: "Allow agents to pin beta releases of the Paperclip core skill.",
     tier: "preference",
     cloudDefault: false,
-    selfHostedDefault: false,
+    selfHostedDefault: true,
   },
   enableSummaries: {
     title: "Summaries",
@@ -228,7 +228,7 @@ export const INSTANCE_FEATURE_CATALOG: Record<InstanceFeatureKey, FeatureCatalog
       "Show Summarizer-generated status slots on project and workspace pages, with on-demand refresh and revision history.",
     tier: "managed",
     cloudDefault: false,
-    selfHostedDefault: false,
+    selfHostedDefault: true,
   },
   enableDecisions: {
     title: "Decisions",
@@ -236,14 +236,14 @@ export const INSTANCE_FEATURE_CATALOG: Record<InstanceFeatureKey, FeatureCatalog
       "Show the Decisions item in the main sidebar — the attention home that surfaces tasks awaiting input.",
     tier: "preference",
     cloudDefault: false,
-    selfHostedDefault: false,
+    selfHostedDefault: true,
   },
   enableGoalsSidebarLink: {
     title: "Goals Sidebar Link",
     description: "Restore the Goals item in the main sidebar while the goals surface is being evaluated.",
     tier: "preference",
     cloudDefault: false,
-    selfHostedDefault: false,
+    selfHostedDefault: true,
   },
   enableSimplifiedEnglishInteractions: {
     title: "Simplified English Interactions",
@@ -251,7 +251,7 @@ export const INSTANCE_FEATURE_CATALOG: Record<InstanceFeatureKey, FeatureCatalog
       "Instruct agents to write user interactions (confirmations, questions, suggested tasks) in ASD-STE100 Simplified Technical English with brief decision context.",
     tier: "preference",
     cloudDefault: false,
-    selfHostedDefault: false,
+    selfHostedDefault: true,
   },
   enableServerInfoDebugView: {
     title: "Server Info Debug View",
@@ -259,7 +259,7 @@ export const INSTANCE_FEATURE_CATALOG: Record<InstanceFeatureKey, FeatureCatalog
       "Show a Server section in the account drawer with the current server restart time and running commit.",
     tier: "preference",
     cloudDefault: false,
-    selfHostedDefault: false,
+    selfHostedDefault: true,
   },
   enablePaperclipDeveloperMode: {
     title: "Paperclip Developer Mode",
@@ -267,7 +267,7 @@ export const INSTANCE_FEATURE_CATALOG: Record<InstanceFeatureKey, FeatureCatalog
       "Show internal Paperclip maintainer tools and observability links, including Honeycomb trace queries on run pages.",
     tier: "preference",
     cloudDefault: false,
-    selfHostedDefault: false,
+    selfHostedDefault: true,
   },
   autoRestartDevServerWhenIdle: {
     title: "Auto-Restart Dev Server When Idle",
@@ -275,7 +275,7 @@ export const INSTANCE_FEATURE_CATALOG: Record<InstanceFeatureKey, FeatureCatalog
       "In local development, wait for queued and running agent runs to finish, then restart the server automatically when backend changes make the current boot stale.",
     tier: "preference",
     cloudDefault: false,
-    selfHostedDefault: false,
+    selfHostedDefault: true,
   },
   enableWorkspaceBranchReconcileForward: {
     title: "Workspace Branch Reconcile Forward",
@@ -299,7 +299,7 @@ export const INSTANCE_FEATURE_CATALOG: Record<InstanceFeatureKey, FeatureCatalog
       "On cloud-managed instances, grant the stack owner instance-admin access to their own dedicated instance. Elevation is computed at the trusted-header auth boundary; no instance admin role rows are created. Inert on self-hosted instances.",
     tier: "managed",
     cloudDefault: true,
-    selfHostedDefault: false,
+    selfHostedDefault: true,
   },
   enableSandboxDuplexBridge: {
     title: "Sandbox Duplex Bridge",
@@ -307,7 +307,7 @@ export const INSTANCE_FEATURE_CATALOG: Record<InstanceFeatureKey, FeatureCatalog
       "Let a run open the sandbox duplex command-stream bridge when the provider grants the capability. The host reads this per run before it selects the transport. Off keeps the file bridge for every run.",
     tier: "managed",
     cloudDefault: false,
-    selfHostedDefault: false,
+    selfHostedDefault: true,
   },
   enableRunnerPreviewIngress: {
     title: "Runner Preview Ingress (Deprecated)",
@@ -323,7 +323,7 @@ export const INSTANCE_FEATURE_CATALOG: Record<InstanceFeatureKey, FeatureCatalog
       "Let the scheduler execute runs inside an isolated git-worktree preview instance for tasks created after activation.",
     tier: "managed",
     cloudDefault: false,
-    selfHostedDefault: false,
+    selfHostedDefault: true,
   },
   enableFirstTaskPlanProposal: {
     title: "First task: propose with a plan document",
@@ -331,7 +331,7 @@ export const INSTANCE_FEATURE_CATALOG: Record<InstanceFeatureKey, FeatureCatalog
       "When the user's first request is a single task, the chief of staff writes a short plan document and a checkbox card instead of a one-card confirmation. Applies to organizations created after the toggle is flipped.",
     tier: "preference",
     cloudDefault: false,
-    selfHostedDefault: false,
+    selfHostedDefault: true,
   },
 };
 

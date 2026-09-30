@@ -24,7 +24,7 @@ export const backupRetentionPolicySchema = z.object({
 
 export const instanceGeneralSettingsSchema = z.object({
   censorUsernameInLogs: z.boolean().default(false),
-  keyboardShortcuts: z.boolean().default(false),
+  keyboardShortcuts: z.boolean().default(true),
   feedbackDataSharingPreference: feedbackDataSharingPreferenceSchema.default(
     DEFAULT_FEEDBACK_DATA_SHARING_PREFERENCE,
   ),
@@ -40,52 +40,52 @@ export const patchInstanceGeneralSettingsSchema = z
   .strict();
 
 export const instanceExperimentalSettingsSchema = z.object({
-  enableEnvironments: z.boolean().default(false),
+  enableEnvironments: z.boolean().default(true),
   enableNativeRunner: z.boolean().default(true),
   enableManagedSandboxOnly: z.boolean().default(false),
-  enableIsolatedWorkspaces: z.boolean().default(false),
-  enableIsolatedWorkspacesByDefault: z.boolean().default(false),
+  enableIsolatedWorkspaces: z.boolean().default(true),
+  enableIsolatedWorkspacesByDefault: z.boolean().default(true),
   enableStreamlinedLeftNavigation: z.boolean().default(true),
   enableStreamlinedUi: z.boolean().default(true),
   // Deprecated compatibility key. Apps is a standard product surface and is
   // always enabled; this remains accepted so older stored rows and managed
   // configs continue to load during upgrades.
   enableApps: z.boolean().default(true),
-  enableChatConnectors: z.boolean().default(false),
+  enableChatConnectors: z.boolean().default(true),
   // Compatibility only: old stored and managed values must still parse.
   enableMcpAggregators: z.boolean().default(true),
-  enableMemoryConnectors: z.boolean().default(false),
-  enablePipelines: z.boolean().default(false),
+  enableMemoryConnectors: z.boolean().default(true),
+  enablePipelines: z.boolean().default(true),
   enableCases: z.boolean().default(true),
-  enableAgentChat: z.boolean().default(false),
-  enableConferenceRoomChat: z.boolean().default(false),
-  enableClassicTaskInterface: z.boolean().default(false),
-  enableIssuePlanDecompositions: z.boolean().default(false),
-  enableExperimentalFileViewer: z.boolean().default(false),
-  enableExternalObjects: z.boolean().default(false),
-  enableSmokeLab: z.boolean().default(false),
-  enableBuiltInAgents: z.boolean().default(false),
-  enableBetaSkills: z.boolean().default(false),
-  enableSummaries: z.boolean().default(false),
+  enableAgentChat: z.boolean().default(true),
+  enableConferenceRoomChat: z.boolean().default(true),
+  enableClassicTaskInterface: z.boolean().default(true),
+  enableIssuePlanDecompositions: z.boolean().default(true),
+  enableExperimentalFileViewer: z.boolean().default(true),
+  enableExternalObjects: z.boolean().default(true),
+  enableSmokeLab: z.boolean().default(true),
+  enableBuiltInAgents: z.boolean().default(true),
+  enableBetaSkills: z.boolean().default(true),
+  enableSummaries: z.boolean().default(true),
   enableStatusCards: z.boolean().default(true),
-  enableDecisions: z.boolean().default(false),
-  enableGoalsSidebarLink: z.boolean().default(false),
-  enableServerInfoDebugView: z.boolean().default(false),
-  enablePaperclipDeveloperMode: z.boolean().default(false),
-  enableSimplifiedEnglishInteractions: z.boolean().default(false),
-  enableFirstTaskPlanProposal: z.boolean().default(false),
-  autoRestartDevServerWhenIdle: z.boolean().default(false),
+  enableDecisions: z.boolean().default(true),
+  enableGoalsSidebarLink: z.boolean().default(true),
+  enableServerInfoDebugView: z.boolean().default(true),
+  enablePaperclipDeveloperMode: z.boolean().default(true),
+  enableSimplifiedEnglishInteractions: z.boolean().default(true),
+  enableFirstTaskPlanProposal: z.boolean().default(true),
+  autoRestartDevServerWhenIdle: z.boolean().default(true),
   enableWorkspaceBranchReconcileForward: z.boolean().default(true),
   enableWorkspaceDirtyQuarantineRepair: z.boolean().default(true),
-  enableOwnerInstanceAdmin: z.boolean().default(false),
+  enableOwnerInstanceAdmin: z.boolean().default(true),
   // Kill switch for the sandbox duplex command-stream bridge. Default off. When
   // off the host keeps the file bridge for every run with no manifest change and
   // no redeploy. The host reads this per run before it selects the transport.
-  enableSandboxDuplexBridge: z.boolean().default(false),
+  enableSandboxDuplexBridge: z.boolean().default(true),
   // Deprecated compatibility key. Runner ingress follows enableNativeRunner;
   // this remains accepted so older stored rows and managed configs keep loading.
   enableRunnerPreviewIngress: z.boolean().default(false),
-  enableWorktreeRunExecution: z.boolean().default(false),
+  enableWorktreeRunExecution: z.boolean().default(true),
   worktreeRunExecutionActivatedAt: z.string().datetime().nullable().default(null),
   worktreeRunExecutionActivationInstanceId: z.string().min(1).nullable().default(null),
 }).strict();

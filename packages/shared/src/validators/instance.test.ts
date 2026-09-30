@@ -5,9 +5,9 @@ import {
 } from "./instance.js";
 
 describe("instance experimental settings validators", () => {
-  it("defaults chat connectors off independently of Apps and accepts only explicit boolean patches", () => {
-    expect(instanceExperimentalSettingsSchema.parse({}).enableChatConnectors).toBe(false);
-    expect(instanceExperimentalSettingsSchema.parse({ enableApps: true }).enableChatConnectors).toBe(false);
+  it("defaults chat connectors on independently of Apps and accepts only explicit boolean patches", () => {
+    expect(instanceExperimentalSettingsSchema.parse({}).enableChatConnectors).toBe(true);
+    expect(instanceExperimentalSettingsSchema.parse({ enableApps: true }).enableChatConnectors).toBe(true);
     expect(patchInstanceExperimentalSettingsSchema.parse({ enableChatConnectors: true }))
       .toEqual({ enableChatConnectors: true });
     expect(patchInstanceExperimentalSettingsSchema.parse({ enableChatConnectors: false }))
@@ -21,17 +21,17 @@ describe("instance experimental settings validators", () => {
     ).toEqual({ enableStreamlinedUi: false });
   });
 
-  it("defaults the server info debug view off", () => {
+  it("defaults the server info debug view on", () => {
     const settings = instanceExperimentalSettingsSchema.parse({});
 
-    expect(settings.enableServerInfoDebugView).toBe(false);
+    expect(settings.enableServerInfoDebugView).toBe(true);
   });
 
-  it("defaults Paperclip developer mode off and accepts explicit patches", () => {
-    expect(instanceExperimentalSettingsSchema.parse({}).enablePaperclipDeveloperMode).toBe(false);
+  it("defaults Paperclip developer mode on and accepts explicit patches", () => {
+    expect(instanceExperimentalSettingsSchema.parse({}).enablePaperclipDeveloperMode).toBe(true);
     expect(
-      patchInstanceExperimentalSettingsSchema.parse({ enablePaperclipDeveloperMode: true }),
-    ).toEqual({ enablePaperclipDeveloperMode: true });
+      patchInstanceExperimentalSettingsSchema.parse({ enablePaperclipDeveloperMode: false }),
+    ).toEqual({ enablePaperclipDeveloperMode: false });
   });
 
   it("strips retired watchdog and liveness auto-recovery settings", () => {
@@ -51,16 +51,16 @@ describe("instance experimental settings validators", () => {
     expect(settings.enableWorkspaceDirtyQuarantineRepair).toBe(true);
   });
 
-  it("defaults the goals sidebar link off", () => {
+  it("defaults the goals sidebar link on", () => {
     const settings = instanceExperimentalSettingsSchema.parse({});
 
-    expect(settings.enableGoalsSidebarLink).toBe(false);
+    expect(settings.enableGoalsSidebarLink).toBe(true);
   });
 
-  it("defaults the sandbox duplex bridge kill switch off", () => {
+  it("defaults the sandbox duplex bridge on", () => {
     const settings = instanceExperimentalSettingsSchema.parse({});
 
-    expect(settings.enableSandboxDuplexBridge).toBe(false);
+    expect(settings.enableSandboxDuplexBridge).toBe(true);
   });
 
   it("accepts an explicit sandbox duplex bridge kill switch value", () => {
@@ -80,10 +80,10 @@ describe("instance experimental settings validators", () => {
     ).toEqual({ enableSandboxDuplexBridge: true });
   });
 
-  it("defaults worktree run execution off", () => {
+  it("defaults worktree run execution on", () => {
     const settings = instanceExperimentalSettingsSchema.parse({});
 
-    expect(settings.enableWorktreeRunExecution).toBe(false);
+    expect(settings.enableWorktreeRunExecution).toBe(true);
     expect(settings.worktreeRunExecutionActivatedAt).toBeNull();
     expect(settings.worktreeRunExecutionActivationInstanceId).toBeNull();
   });
@@ -100,16 +100,16 @@ describe("instance experimental settings validators", () => {
     });
   });
 
-  it("defaults built-in agents off", () => {
+  it("defaults built-in agents on", () => {
     const settings = instanceExperimentalSettingsSchema.parse({});
 
-    expect(settings.enableBuiltInAgents).toBe(false);
+    expect(settings.enableBuiltInAgents).toBe(true);
   });
 
-  it("defaults beta skills off", () => {
+  it("defaults beta skills on", () => {
     const settings = instanceExperimentalSettingsSchema.parse({});
 
-    expect(settings.enableBetaSkills).toBe(false);
+    expect(settings.enableBetaSkills).toBe(true);
   });
 
   it("defaults the retired Apps compatibility key on", () => {
@@ -128,10 +128,10 @@ describe("instance experimental settings validators", () => {
     });
   });
 
-  it("defaults the decisions sidebar link off", () => {
+  it("defaults the decisions sidebar link on", () => {
     const settings = instanceExperimentalSettingsSchema.parse({});
 
-    expect(settings.enableDecisions).toBe(false);
+    expect(settings.enableDecisions).toBe(true);
   });
 
   it("accepts decisions patches", () => {

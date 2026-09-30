@@ -7,9 +7,9 @@ import {
 } from "../services/instance-settings.js";
 
 describe("instance settings service", () => {
-  it("keeps chat connectors opt-in across legacy storage and patches without disabling Apps", () => {
+  it("keeps chat connectors on by default and still patchable without disabling Apps", () => {
     for (const stored of [undefined, {}, { enableApps: true }, { enableConferenceRoomChat: true }]) {
-      expect(normalizeExperimentalSettings(stored).enableChatConnectors).toBe(false);
+      expect(normalizeExperimentalSettings(stored).enableChatConnectors).toBe(true);
     }
     const enabled = applyExperimentalSettingsPatch({}, { enableChatConnectors: true });
     expect(normalizeExperimentalSettings(JSON.parse(JSON.stringify(enabled))).enableChatConnectors).toBe(true);
@@ -37,39 +37,39 @@ describe("instance settings service", () => {
       enableNativeRunner: false,
       enableManagedSandboxOnly: false,
       enableIsolatedWorkspaces: true,
-      enableIsolatedWorkspacesByDefault: false,
+      enableIsolatedWorkspacesByDefault: true,
       enableStreamlinedLeftNavigation: true,
       enableStreamlinedUi: true,
       enableApps: true,
-    enableMcpAggregators: true,
-      enableAgentChat: false,
-      enableChatConnectors: false,
-      enableMemoryConnectors: false,
-      enableConferenceRoomChat: false,
-      enableClassicTaskInterface: false,
-      enableExternalObjects: false,
-      enableSmokeLab: false,
-      enablePipelines: false,
+      enableMcpAggregators: true,
+      enableAgentChat: true,
+      enableChatConnectors: true,
+      enableMemoryConnectors: true,
+      enableConferenceRoomChat: true,
+      enableClassicTaskInterface: true,
+      enableExternalObjects: true,
+      enableSmokeLab: true,
+      enablePipelines: true,
       enableCases: true,
       enableIssuePlanDecompositions: true,
       enableExperimentalFileViewer: true,
       enableBuiltInAgents: true,
-      enableBetaSkills: false,
-      enableSummaries: false,
+      enableBetaSkills: true,
+      enableSummaries: true,
       enableStatusCards: true,
-      enableDecisions: false,
+      enableDecisions: true,
       enableGoalsSidebarLink: true,
       enableServerInfoDebugView: true,
       enablePaperclipDeveloperMode: true,
-      enableSimplifiedEnglishInteractions: false,
-      enableFirstTaskPlanProposal: false,
+      enableSimplifiedEnglishInteractions: true,
+      enableFirstTaskPlanProposal: true,
       autoRestartDevServerWhenIdle: true,
       enableWorkspaceBranchReconcileForward: true,
       enableWorkspaceDirtyQuarantineRepair: false,
-      enableOwnerInstanceAdmin: false,
-      enableSandboxDuplexBridge: false,
+      enableOwnerInstanceAdmin: true,
+      enableSandboxDuplexBridge: true,
       enableRunnerPreviewIngress: false,
-      enableWorktreeRunExecution: false,
+      enableWorktreeRunExecution: true,
       worktreeRunExecutionActivatedAt: null,
       worktreeRunExecutionActivationInstanceId: null,
     });
@@ -98,81 +98,84 @@ describe("instance settings service", () => {
     ).toBe(true);
   });
 
-  it("defaults enableConferenceRoomChat to false for empty and legacy stored settings", () => {
-    expect(normalizeExperimentalSettings(undefined).enableConferenceRoomChat).toBe(false);
-    expect(normalizeExperimentalSettings({}).enableConferenceRoomChat).toBe(false);
-    // Rows persisted before the flag existed (PAP-137) must normalize to off.
+  it("defaults enableConferenceRoomChat to true for empty and legacy stored settings", () => {
+    expect(normalizeExperimentalSettings(undefined).enableConferenceRoomChat).toBe(true);
+    expect(normalizeExperimentalSettings({}).enableConferenceRoomChat).toBe(true);
+    // Rows persisted before the flag existed (PAP-137) now normalize to on.
     expect(
       normalizeExperimentalSettings({ enableStreamlinedLeftNavigation: true }).enableConferenceRoomChat,
+    ).toBe(true);
+    expect(
+      normalizeExperimentalSettings({ enableConferenceRoomChat: false }).enableConferenceRoomChat,
     ).toBe(false);
   });
 
-  it("defaults enableClassicTaskInterface to false for empty and legacy stored settings", () => {
-    expect(normalizeExperimentalSettings(undefined).enableClassicTaskInterface).toBe(false);
-    expect(normalizeExperimentalSettings({}).enableClassicTaskInterface).toBe(false);
+  it("defaults enableClassicTaskInterface to true and still honors an explicit off", () => {
+    expect(normalizeExperimentalSettings(undefined).enableClassicTaskInterface).toBe(true);
+    expect(normalizeExperimentalSettings({}).enableClassicTaskInterface).toBe(true);
     // The retired enableTaskChatRedesign key must not bleed into the new flag:
     // an install that had the chat redesign ON opted into chat-style, which is
     // now the default — not into the classic view.
     expect(
       normalizeExperimentalSettings({ enableTaskChatRedesign: true }).enableClassicTaskInterface,
-    ).toBe(false);
-    expect(
-      normalizeExperimentalSettings({ enableClassicTaskInterface: true }).enableClassicTaskInterface,
     ).toBe(true);
+    expect(
+      normalizeExperimentalSettings({ enableClassicTaskInterface: false }).enableClassicTaskInterface,
+    ).toBe(false);
   });
 
-  it("defaults enableSimplifiedEnglishInteractions to false for empty and legacy stored settings", () => {
-    expect(normalizeExperimentalSettings(undefined).enableSimplifiedEnglishInteractions).toBe(false);
-    expect(normalizeExperimentalSettings({}).enableSimplifiedEnglishInteractions).toBe(false);
+  it("defaults enableSimplifiedEnglishInteractions to true and still honors an explicit off", () => {
+    expect(normalizeExperimentalSettings(undefined).enableSimplifiedEnglishInteractions).toBe(true);
+    expect(normalizeExperimentalSettings({}).enableSimplifiedEnglishInteractions).toBe(true);
     expect(
       normalizeExperimentalSettings({ enableStreamlinedLeftNavigation: true })
         .enableSimplifiedEnglishInteractions,
-    ).toBe(false);
+    ).toBe(true);
     expect(
-      normalizeExperimentalSettings({ enableSimplifiedEnglishInteractions: true })
+      normalizeExperimentalSettings({ enableSimplifiedEnglishInteractions: false })
         .enableSimplifiedEnglishInteractions,
+    ).toBe(false);
+  });
+
+  it("defaults enableSmokeLab to true for empty and legacy stored settings", () => {
+    expect(normalizeExperimentalSettings(undefined).enableSmokeLab).toBe(true);
+    expect(normalizeExperimentalSettings({}).enableSmokeLab).toBe(true);
+    expect(
+      normalizeExperimentalSettings({ enableExternalObjects: true }).enableSmokeLab,
     ).toBe(true);
   });
 
-  it("defaults enableSmokeLab to false for empty and legacy stored settings", () => {
-    expect(normalizeExperimentalSettings(undefined).enableSmokeLab).toBe(false);
-    expect(normalizeExperimentalSettings({}).enableSmokeLab).toBe(false);
-    expect(
-      normalizeExperimentalSettings({ enableExternalObjects: true }).enableSmokeLab,
-    ).toBe(false);
-  });
-
-  it("defaults enableServerInfoDebugView to false for empty and legacy stored settings", () => {
-    expect(normalizeExperimentalSettings(undefined).enableServerInfoDebugView).toBe(false);
-    expect(normalizeExperimentalSettings({}).enableServerInfoDebugView).toBe(false);
+  it("defaults enableServerInfoDebugView to true for empty and legacy stored settings", () => {
+    expect(normalizeExperimentalSettings(undefined).enableServerInfoDebugView).toBe(true);
+    expect(normalizeExperimentalSettings({}).enableServerInfoDebugView).toBe(true);
     expect(
       normalizeExperimentalSettings({ autoRestartDevServerWhenIdle: true }).enableServerInfoDebugView,
-    ).toBe(false);
+    ).toBe(true);
   });
 
-  it("defaults enablePaperclipDeveloperMode to false for empty and legacy settings", () => {
-    expect(normalizeExperimentalSettings(undefined).enablePaperclipDeveloperMode).toBe(false);
-    expect(normalizeExperimentalSettings({}).enablePaperclipDeveloperMode).toBe(false);
+  it("defaults enablePaperclipDeveloperMode to true for empty and legacy settings", () => {
+    expect(normalizeExperimentalSettings(undefined).enablePaperclipDeveloperMode).toBe(true);
+    expect(normalizeExperimentalSettings({}).enablePaperclipDeveloperMode).toBe(true);
     expect(
       normalizeExperimentalSettings({ enableServerInfoDebugView: true })
         .enablePaperclipDeveloperMode,
-    ).toBe(false);
+    ).toBe(true);
   });
 
-  it("defaults enableGoalsSidebarLink to false for empty and legacy stored settings", () => {
-    expect(normalizeExperimentalSettings(undefined).enableGoalsSidebarLink).toBe(false);
-    expect(normalizeExperimentalSettings({}).enableGoalsSidebarLink).toBe(false);
+  it("defaults enableGoalsSidebarLink to true for empty and legacy stored settings", () => {
+    expect(normalizeExperimentalSettings(undefined).enableGoalsSidebarLink).toBe(true);
+    expect(normalizeExperimentalSettings({}).enableGoalsSidebarLink).toBe(true);
     expect(
       normalizeExperimentalSettings({ enableStreamlinedLeftNavigation: true }).enableGoalsSidebarLink,
-    ).toBe(false);
+    ).toBe(true);
   });
 
-  it("defaults enableDecisions to false for empty and legacy stored settings", () => {
-    expect(normalizeExperimentalSettings(undefined).enableDecisions).toBe(false);
-    expect(normalizeExperimentalSettings({}).enableDecisions).toBe(false);
+  it("defaults enableDecisions to true for empty and legacy stored settings", () => {
+    expect(normalizeExperimentalSettings(undefined).enableDecisions).toBe(true);
+    expect(normalizeExperimentalSettings({}).enableDecisions).toBe(true);
     expect(
       normalizeExperimentalSettings({ enableStreamlinedLeftNavigation: true }).enableDecisions,
-    ).toBe(false);
+    ).toBe(true);
   });
 
   it("defaults workspace branch repair settings to true for empty and legacy stored settings", () => {
@@ -195,30 +198,31 @@ describe("instance settings service", () => {
     // re-normalizes; emulate that to prove the flag survives the roundtrip
     // without disturbing other settings.
     const current = normalizeExperimentalSettings({});
-    const enabled = normalizeExperimentalSettings({ ...current, enableConferenceRoomChat: true });
-    expect(enabled.enableConferenceRoomChat).toBe(true);
-    expect(enabled.enableStreamlinedLeftNavigation).toBe(true);
-
-    const disabled = normalizeExperimentalSettings({ ...enabled, enableConferenceRoomChat: false });
-    expect(disabled).toEqual(current);
+    expect(current.enableConferenceRoomChat).toBe(true);
+    const disabled = normalizeExperimentalSettings({ ...current, enableConferenceRoomChat: false });
+    expect(disabled.enableConferenceRoomChat).toBe(false);
+    // Every other setting is untouched by the disable patch.
+    const { enableConferenceRoomChat: _patched, ...currentRest } = current;
+    const { enableConferenceRoomChat: _unpatched, ...disabledRest } = disabled;
+    expect(disabledRest).toEqual(currentRest);
   });
 
   it("rejects non-boolean enableConferenceRoomChat values back to the default", () => {
     expect(
       normalizeExperimentalSettings({ enableConferenceRoomChat: "yes" }).enableConferenceRoomChat,
-    ).toBe(false);
+    ).toBe(true);
   });
 
-  it("defaults enableBuiltInAgents to false for empty and legacy stored settings", () => {
-    expect(normalizeExperimentalSettings(undefined).enableBuiltInAgents).toBe(false);
-    expect(normalizeExperimentalSettings({}).enableBuiltInAgents).toBe(false);
-    expect(normalizeExperimentalSettings({ enableExternalObjects: true }).enableBuiltInAgents).toBe(false);
+  it("defaults enableBuiltInAgents to true for empty and legacy stored settings", () => {
+    expect(normalizeExperimentalSettings(undefined).enableBuiltInAgents).toBe(true);
+    expect(normalizeExperimentalSettings({}).enableBuiltInAgents).toBe(true);
+    expect(normalizeExperimentalSettings({ enableExternalObjects: true }).enableBuiltInAgents).toBe(true);
   });
 
-  it("preserves enableBetaSkills and defaults it off for legacy stored settings", () => {
-    expect(normalizeExperimentalSettings(undefined).enableBetaSkills).toBe(false);
-    expect(normalizeExperimentalSettings({}).enableBetaSkills).toBe(false);
-    expect(normalizeExperimentalSettings({ enableBetaSkills: true }).enableBetaSkills).toBe(true);
+  it("preserves enableBetaSkills and defaults it on for legacy stored settings", () => {
+    expect(normalizeExperimentalSettings(undefined).enableBetaSkills).toBe(true);
+    expect(normalizeExperimentalSettings({}).enableBetaSkills).toBe(true);
+    expect(normalizeExperimentalSettings({ enableBetaSkills: false }).enableBetaSkills).toBe(false);
   });
 
   it("sets worktree run execution activation fields on a false to true transition", () => {

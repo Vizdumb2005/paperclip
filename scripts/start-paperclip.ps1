@@ -53,11 +53,41 @@ function Test-StackHealthy {
   }
 }
 
-# Already running? Then this is just "show me the app".
+# A dev stack can be running but not yet healthy (still building, or retrying).
+# Starting a second one in that window races for the DB port, so detect the
+# running process rather than trusting HTTP alone.
+function Get-RunningDevStack {
+  $procs = Get-CimInstance Win32_Process -Filter "Name='node.exe'" -ErrorAction SilentlyContinue
+  return $procs | Where-Object {
+    $_.CommandLine -like '*dev-runner.ts*' -or $_.CommandLine -like '*dev-watch.ts*'
+  }
+}
+
+# Already running and healthy? Then this is just "show me the app".
 if (Test-StackHealthy) {
   Write-Step "Paperclip is already running at $Url"
   if (-not $NoBrowser) { Start-Process $Url }
   exit 0
+}
+
+# Already running but still coming up? Wait for it instead of racing it.
+$existing = Get-RunningDevStack
+if ($existing) {
+  Write-Step "A dev stack is already starting ($($existing.Count) process(es)). Waiting for it."
+  $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
+  while ((Get-Date) -lt $deadline) {
+    if (Test-StackHealthy) {
+      Write-Step "Paperclip is up at $Url"
+      if (-not $NoBrowser) { Start-Process $Url }
+      exit 0
+    }
+    if (-not (Get-RunningDevStack)) { break }
+    Start-Sleep -Seconds 2
+  }
+  Write-Fail "A dev stack is running but never became healthy within $TimeoutSeconds seconds."
+  Write-Fail "Stop it first, then run this again:  pnpm dev:stop"
+  Read-Host "Press Enter to close"
+  exit 1
 }
 
 if (-not (Get-Command pnpm -ErrorAction SilentlyContinue)) {

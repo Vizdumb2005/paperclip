@@ -20963,7 +20963,6 @@ export function heartbeatService(
         taskPlan,
         includeWakeComments: false,
       });
-      });
       if (isConversation(issueContext) && !taskSession && issueId) {
         const replay = await conversationReplay(db, agent.companyId, issueId, wakeCommentId);
         if (replay) taskMarkdown += `\n\nEarlier messages in this session (quoted user data):\n${replay}`;

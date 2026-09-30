@@ -65,6 +65,11 @@
           "secretRef": "company_secrets"
         }
       ],
+      "keyPlacement": {
+        "location": "header",
+        "name": "Authorization",
+        "prefix": "Bearer "
+      },
       "requiredResourceFilters": [
         "team",
         "project",
@@ -73,6 +78,7 @@
     }
   ],
   "availability": {
-    "available": true
+    "available": false,
+    "reason": "Blocked pending Vercel Connect pilot review."
   }
 }

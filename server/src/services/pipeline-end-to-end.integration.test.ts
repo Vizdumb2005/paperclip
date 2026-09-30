@@ -13,15 +13,16 @@ import {
   approvals,
 } from "@paperclipai/db";
 import {
-  companyMemoryService,
-  workQueueService,
   MaximizerCircuitBreaker,
   verifyRunRequirements,
-  organizationalLearningService,
-  selfOrganizationService,
-  ceoChatService,
-  ticketOnRampService,
 } from "./index.js";
+// Unregistered from the services barrel by design; imported by module path.
+import { companyMemoryService } from "./company-memory.js";
+import { workQueueService } from "./work-queues.js";
+import { organizationalLearningService } from "./organizational-learning.js";
+import { selfOrganizationService } from "./self-organization.js";
+import { ceoChatService } from "./ceo-chat.js";
+import { ticketOnRampService } from "./ticket-on-ramps.js";
 import { companyMemoryRoutes } from "../routes/company-memory.js";
 import { workQueueRoutes } from "../routes/work-queues.js";
 import { ceoChatRoutes } from "../routes/ceo-chat.js";

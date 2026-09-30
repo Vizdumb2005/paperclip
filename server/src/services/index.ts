@@ -217,8 +217,6 @@ export {
   type RemoteAgentProfileInput,
   type RemoteAgentService,
 } from "./remote-agent-profiles.js";
-export { companyMemoryService } from "./company-memory.js";
-export { workQueueService, classifyWithLaya } from "./work-queues.js";
 export {
   parseMarkdownLayout,
   chunkSections,
@@ -230,11 +228,13 @@ export {
   verifyRunRequirements,
   DEFAULT_MAXIMIZER_POLICY,
 } from "./maximizer-orchestrator.js";
-export { runVerificationService } from "./run-verification.js";
-export { organizationalLearningService } from "./organizational-learning.js";
-export { selfOrganizationService } from "./self-organization.js";
-export { ceoChatService, parseCeoWorkActions } from "./ceo-chat.js";
-export { ticketOnRampService } from "./ticket-on-ramps.js";
-export { LayaDecisionEngine, defaultLayaEngine } from "./laya-engine.js";
-export { assessApprovalRiskWithLaya } from "./laya-risk-scorer.js";
+
+// The autonomous control-plane services (company-memory, work-queues,
+// run-verification, organizational-learning, self-organization, ceo-chat,
+// ticket-on-ramps, laya-engine, laya-risk-scorer) are intentionally NOT
+// re-exported here. They stay on disk and are imported by their own module
+// paths, but keeping them out of this barrel means route tests can mock
+// ../services/index.js with an exhaustive factory without having to stub
+// exports that upstream does not know about. Consumers should import these
+// directly, e.g. `import { companyMemoryService } from "../services/company-memory.js"`.
 

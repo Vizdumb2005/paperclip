@@ -178,11 +178,13 @@ import {
   projectService,
   routineService,
   workProductService,
-  organizationalLearningService,
-  ticketOnRampService,
-  runVerificationService,
-  companyMemoryService,
 } from "../services/index.js";
+// Deliberately not imported from the services barrel: these modules are
+// unregistered there so route tests can mock the barrel exhaustively.
+import { organizationalLearningService } from "../services/organizational-learning.js";
+import { ticketOnRampService } from "../services/ticket-on-ramps.js";
+import { runVerificationService } from "../services/run-verification.js";
+import { companyMemoryService } from "../services/company-memory.js";
 import {
   runnerGoalService,
   RunnerGoalActionError,
